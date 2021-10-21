@@ -1,5 +1,6 @@
 package com.example.fundo.ui.authentication
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -14,11 +15,14 @@ import com.example.fundo.utils.Validators
 
 class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
     private lateinit var binding : SignUpFragmentBinding
+    private lateinit var dialog : Dialog
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding = SignUpFragmentBinding.bind(view)
+        dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.loading_dialog)
 
         attachListeners()
     }
@@ -36,6 +40,8 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
     }
 
     private fun register() {
+        dialog.show()
+
         var name = binding.nameTextEdit
         var email = binding.emailTextEdit
         var phone = binding.phoneTextEdit
@@ -54,6 +60,7 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
                 else{
                     Database.addUserToDB(user)
                 }
+                dialog.dismiss()
             }
         }
     }
