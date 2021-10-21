@@ -27,35 +27,38 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/usernameTextEditLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/smallWelcomeText"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:layout_below="@+id/smallWelcomeText"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         >
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/usernameTextEdit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Username"/>
+            android:hint="Email" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/passwordTextEditLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/usernameTextEditLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
         android:inputType="textPassword"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        >
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordTextEdit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Password"/>
+            android:hint="Password" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView

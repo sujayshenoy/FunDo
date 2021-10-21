@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.example.fundo.models.User
 
 object Utilities {
     fun fragmentSwitcher(supportFragmentManager: FragmentManager,replaceFragment: Int, replaceWithfragment: Fragment) {
@@ -15,5 +16,9 @@ object Utilities {
 
     fun displayToast(context: Context, message:String){
         Toast.makeText(context,message,Toast.LENGTH_LONG).show()
+    }
+
+    fun createUserFromHashMap(userMap:HashMap<*,*>):User {
+        return User(userMap["name"].toString(),userMap["email"].toString(),userMap["phone"].toString())
     }
 }

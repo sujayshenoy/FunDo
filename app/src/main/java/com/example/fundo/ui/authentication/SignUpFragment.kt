@@ -59,9 +59,13 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
                 }
                 else{
                     Database.addUserToDB(user)
+                    //TODO(go to home)
                 }
                 dialog.dismiss()
             }
+        }
+        else{
+            dialog.dismiss()
         }
     }
 }
