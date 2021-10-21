@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fundo">
         <activity
-            android:name=".ui.activities.Authentication"
+            android:name=".ui.authentication.Authentication"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

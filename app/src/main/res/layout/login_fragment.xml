@@ -10,60 +10,94 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="30dp"
         android:text="Welcome Back"
         android:textColor="@color/black"
         android:textSize="34sp"
         android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/smallWelcomeText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Please login to continue"
-            android:textSize="16sp"
-            android:layout_below="@+id/welcomeText"
-            android:layout_marginLeft="10dp"/>
+    <TextView
+        android:id="@+id/smallWelcomeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please login to continue"
+        android:textSize="16sp"
+        android:layout_below="@+id/welcomeText"
+        android:layout_marginLeft="10dp"/>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/usernameTextEditLayout"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:layout_below="@+id/smallWelcomeText"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/usernameTextEdit"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="50dp"
-            android:layout_below="@+id/smallWelcomeText"
-            android:hint="Username" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Username"/>
 
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordTextEditLayout"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/usernameTextEditLayout"
+        android:inputType="textPassword"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordTextEdit"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_centerHorizontal="true"
-            android:hint="Password"
-            android:layout_below="@+id/usernameTextEdit"
-            android:inputType="textPassword" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Password"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/forgotPasswordText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/passwordTextEdit"
-        android:layout_alignStart="@+id/passwordTextEdit"
+        android:layout_below="@+id/passwordTextEditLayout"
+        android:layout_alignStart="@+id/passwordTextEditLayout"
         android:layout_marginLeft="5dp"
         android:text="Forgot Password?"
         android:textColor="@color/purple_700"
         android:textSize="14sp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/loginButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Login"
-            android:textColor="@color/material_text_color"
-            android:layout_below="@id/passwordTextEdit"
-            android:layout_marginTop="30dp"
-            android:layout_centerHorizontal="true"
-            android:textSize="25sp" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/passwordTextEditLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:text="Login"
+        android:textColor="@color/material_text_color"
+        android:textSize="25sp" />
 
+    <TextView
+        android:id="@+id/regLogChangeLText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/loginButton"
+        android:layout_alignStart="@id/passwordTextEditLayout"
+        android:layout_marginTop="10dp"
+        android:text="Don't have an account?"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/regLogChangeRText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/loginButton"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/regLogChangeLText"
+        android:text="Register"
+        android:textColor="@color/purple_700"
+        android:textSize="14sp" />
 </RelativeLayout>

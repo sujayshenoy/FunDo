@@ -1,8 +1,9 @@
 package com.example.fundo.utils
 
+import android.content.Context
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.example.fundo.R
 
 object Utilities {
     fun fragmentSwitcher(supportFragmentManager: FragmentManager,replaceFragment: Int, replaceWithfragment: Fragment) {
@@ -10,5 +11,9 @@ object Utilities {
         var fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(replaceFragment, replaceWithfragment)
         fragmentTransaction.commit()
+    }
+
+    fun displayToast(context: Context, message:String){
+        Toast.makeText(context,message,Toast.LENGTH_LONG).show()
     }
 }

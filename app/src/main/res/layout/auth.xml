@@ -4,35 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activities.Authentication">
+    tools:context=".ui.authentication.Authentication">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/authFragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"/>
+        android:layout_marginRight="20dp" />
 
-    <TextView
-        android:id="@+id/regLogChangeLText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/authFragmentContainer"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="10dp"
-        android:text="Don't have an account?"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/regLogChangeRText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/authFragmentContainer"
-        android:layout_marginTop="10dp"
-        android:layout_toRightOf="@id/regLogChangeLText"
-        android:text="Register"
-        android:textColor="@color/purple_700"
-        android:textSize="14sp" />
 
 </RelativeLayout>
