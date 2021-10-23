@@ -53,12 +53,11 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
                 email.text.toString() ,
                 phone.text.toString())
 
-            Auth.signUpWithEmailAndPassword(email.text.toString(),password.text.toString()){ firebaseUser ->
+            Auth.signUpWithEmailAndPassword(user,password.text.toString()){ firebaseUser ->
                 if(firebaseUser == null) {
                     Utilities.displayToast(requireContext(),"Sign Up Failed")
                 }
                 else{
-                    Database.addUserToDB(user)
                     //TODO(go to home)
                 }
                 dialog.dismiss()

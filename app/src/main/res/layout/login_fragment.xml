@@ -58,7 +58,8 @@
             android:id="@+id/passwordTextEdit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Password" />
+            android:hint="Password"
+            android:inputType="textPassword"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -103,4 +104,25 @@
         android:text="Register"
         android:textColor="@color/purple_700"
         android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/orText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Or"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_below="@id/regLogChangeLText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/facebook_login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:layout_below="@+id/orText"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
