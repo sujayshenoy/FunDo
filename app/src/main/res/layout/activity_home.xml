@@ -6,14 +6,33 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeActivity">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/toolbar_border"
+        app:elevation="0dp"
+        >
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/drawer_menu"
+            app:title="@string/app_name" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+
     <TextView
         android:id="@+id/mainActivityText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
         android:text="Home Activity"
-        android:textSize="40sp"/>
+        android:textSize="40sp" />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logOutButton"
         android:layout_width="wrap_content"
