@@ -11,6 +11,7 @@ import com.example.fundo.databinding.LoginFragmentBinding
 import com.example.fundo.models.User
 import com.example.fundo.services.Auth
 import com.example.fundo.services.Database
+import com.example.fundo.ui.home.HomeActivity
 import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
 import com.facebook.AccessToken
@@ -28,15 +29,6 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(Auth.getCurrentUser() != null){
-//            Auth.signOut()   //TODO(Remove this later)
-            Utilities.displayToast(requireContext(),"User already logged in")
-            Database.getUserFromDB {
-                val user = Utilities.createUserFromHashMap(it)
-            }
-            //TODO(GO to home page)
-        }
-
         binding = LoginFragmentBinding.bind(view)
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.loading_dialog)
@@ -52,6 +44,10 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     }
 
     private fun attachListeners() {
+        binding.forgotPasswordText.setOnClickListener{
+            Utilities.fragmentSwitcher(requireActivity().supportFragmentManager,R.id.authFragmentContainer,ResetPasswordFragment())
+        }
+
         binding.regLogChangeRText.setOnClickListener{
             Utilities.fragmentSwitcher(requireActivity().supportFragmentManager,R.id.authFragmentContainer,
                 SignUpFragment()
@@ -83,7 +79,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
                         else{
                             Database.getUserFromDB {
                                 var user = Utilities.createUserFromHashMap(it)
-                                //TODO(GO TO HOMEPAGE)
+                                goToHomePage()
                             }
                         }
                     }
@@ -91,6 +87,12 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
             })
         }
+    }
+
+    private fun goToHomePage() {
+        var intent = Intent(requireActivity(),HomeActivity::class.java)
+        requireActivity().finish()
+        startActivity(intent)
     }
 
     private fun login() {
@@ -109,7 +111,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
                         val user = Utilities.createUserFromHashMap(it)
                         Log.i("Auth","User object $user")
                     }
-                    //TODO(GO to home page)
+                    goToHomePage()
                 }
                 dialog.dismiss()
             }

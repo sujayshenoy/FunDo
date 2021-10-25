@@ -1,14 +1,13 @@
 package com.example.fundo.services
 
 import android.util.Log
+import android.webkit.ValueCallback
 import android.widget.Toast
 import com.example.fundo.models.User
 import com.example.fundo.utils.Utilities
 import com.facebook.AccessToken
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.FacebookAuthProvider
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.facebook.login.LoginManager
+import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
@@ -52,7 +51,7 @@ object Auth {
         }
     }
 
-    fun handleFacebookLogin(accessToken: AccessToken, callback: (FirebaseUser?) -> Unit){
+    fun handleFacebookLogin(accessToken: AccessToken, callback: (FirebaseUser?) -> Unit) {
         Log.d("Facebook-OAuth",accessToken.toString())
 
         var credential = FacebookAuthProvider.getCredential(accessToken.token)
@@ -76,6 +75,19 @@ object Auth {
             }
     }
 
-    fun signOut() = auth.signOut()
+    fun signOut() {
+        auth.signOut()
+        LoginManager.getInstance().logOut()
+    }
 
+    fun resetPassword(email:String,callback: (String) -> Unit) {
+        auth.sendPasswordResetEmail(email).addOnCompleteListener {
+            if(it.isSuccessful){
+                callback("Password reset link has been sent to $email")
+            }
+            else{
+                callback("Email not registered! Please register from registration screen")
+            }
+        }
+    }
 }

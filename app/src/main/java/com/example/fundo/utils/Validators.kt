@@ -55,6 +55,16 @@ object Validators {
         return flag
     }
 
+    fun resetPasswordValidator(email: TextInputEditText) : Boolean {
+        var flag = true
+        if(!emailVaidator(email.text.toString())){
+            email.setError("Please enter a valid email address")
+            flag = false
+        }
+
+        return flag
+    }
+
     private fun nameValidator(name:String)  = name.isNotEmpty()
 
     private fun emailVaidator(email: String) = Patterns.EMAIL_ADDRESS.matcher(email).matches()

@@ -1,6 +1,7 @@
 package com.example.fundo.ui.authentication
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -10,6 +11,7 @@ import com.example.fundo.databinding.SignUpFragmentBinding
 import com.example.fundo.models.User
 import com.example.fundo.services.Auth
 import com.example.fundo.services.Database
+import com.example.fundo.ui.home.HomeActivity
 import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
 
@@ -39,6 +41,12 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
         }
     }
 
+    private fun goToHomePage() {
+        var intent = Intent(requireActivity(), HomeActivity::class.java)
+        requireActivity().finish()
+        startActivity(intent)
+    }
+
     private fun register() {
         dialog.show()
 
@@ -58,7 +66,7 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
                     Utilities.displayToast(requireContext(),"Sign Up Failed")
                 }
                 else{
-                    //TODO(go to home)
+                    goToHomePage()
                 }
                 dialog.dismiss()
             }

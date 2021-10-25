@@ -20,10 +20,10 @@
         android:id="@+id/smallWelcomeText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Please login to continue"
-        android:textSize="16sp"
         android:layout_below="@+id/welcomeText"
-        android:layout_marginLeft="10dp"/>
+        android:layout_marginLeft="10dp"
+        android:text="Please login to continue"
+        android:textSize="16sp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/usernameTextEditLayout"
@@ -120,9 +120,9 @@
         android:id="@+id/facebook_login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/orText"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"
-        android:layout_below="@+id/orText"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginBottom="30dp" />
 </RelativeLayout>
