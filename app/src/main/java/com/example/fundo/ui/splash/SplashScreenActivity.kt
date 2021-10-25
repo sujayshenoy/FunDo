@@ -6,13 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.fundo.databinding.SplashScreenBinding
 import com.example.fundo.services.Auth
 import com.example.fundo.services.Database
-import com.example.fundo.ui.authentication.Authentication
+import com.example.fundo.ui.authentication.AuthenticationActivity
+import com.example.fundo.ui.authentication.AuthenticationViewModel
 import com.example.fundo.ui.home.HomeActivity
-import com.example.fundo.utils.Utilities
 
 class SplashScreenActivity: AppCompatActivity() {
     private lateinit var binding: SplashScreenBinding
-
+    private lateinit var authenticationViewModel: AuthenticationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +24,7 @@ class SplashScreenActivity: AppCompatActivity() {
         splashScreenIcon.alpha = 0f
         splashScreenIcon.animate().setDuration(1500).alpha(1f).withEndAction{
             if(Auth.getCurrentUser() == null){
-                val intent = Intent(this, Authentication::class.java)
+                val intent = Intent(this, AuthenticationActivity::class.java)
                 finish()
                 startActivity(intent)
             }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.databinding.LoginFragmentBinding
 import com.example.fundo.models.User
@@ -25,6 +26,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     private lateinit var binding:LoginFragmentBinding
     private lateinit var dialog:Dialog
     private lateinit var callbackManager:CallbackManager
+    private lateinit var authenticationViewModel: AuthenticationViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -32,6 +34,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         binding = LoginFragmentBinding.bind(view)
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.loading_dialog)
+        authenticationViewModel = ViewModelProvider(requireActivity(),AuthenticationViewModelFactory())[AuthenticationViewModel::class.java]
         callbackManager = CallbackManager.Factory.create()
 
         attachListeners()
@@ -45,13 +48,11 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
     private fun attachListeners() {
         binding.forgotPasswordText.setOnClickListener{
-            Utilities.fragmentSwitcher(requireActivity().supportFragmentManager,R.id.authFragmentContainer,ResetPasswordFragment())
+            authenticationViewModel.setGoToResetPassword(true)
         }
 
         binding.regLogChangeRText.setOnClickListener{
-            Utilities.fragmentSwitcher(requireActivity().supportFragmentManager,R.id.authFragmentContainer,
-                SignUpFragment()
-            )
+            authenticationViewModel.setGoToSignUpScreenStatus(true)
         }
 
         binding.loginButton.setOnClickListener{
@@ -90,9 +91,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     }
 
     private fun goToHomePage() {
-        var intent = Intent(requireActivity(),HomeActivity::class.java)
-        requireActivity().finish()
-        startActivity(intent)
+        authenticationViewModel.setGoToHome(true)
     }
 
     private fun login() {
