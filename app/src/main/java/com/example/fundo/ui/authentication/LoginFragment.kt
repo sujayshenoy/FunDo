@@ -9,18 +9,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.databinding.LoginFragmentBinding
-import com.example.fundo.models.User
 import com.example.fundo.services.Auth
 import com.example.fundo.services.Database
-import com.example.fundo.ui.home.HomeActivity
 import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
-import com.facebook.AccessToken
+import com.example.fundo.viewmodels.AuthenticationViewModel
+import com.example.fundo.viewmodels.AuthenticationViewModelFactory
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginResult
-import com.google.firebase.auth.FacebookAuthProvider
 
 class LoginFragment : Fragment(R.layout.login_fragment) {
     private lateinit var binding:LoginFragmentBinding
@@ -34,10 +32,23 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         binding = LoginFragmentBinding.bind(view)
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.loading_dialog)
-        authenticationViewModel = ViewModelProvider(requireActivity(),AuthenticationViewModelFactory())[AuthenticationViewModel::class.java]
+        authenticationViewModel = ViewModelProvider(requireActivity(),
+            AuthenticationViewModelFactory()
+        )[AuthenticationViewModel::class.java]
         callbackManager = CallbackManager.Factory.create()
 
         attachListeners()
+        attachObservers()
+    }
+
+    private fun attachObservers() {
+        authenticationViewModel.emailPassLoginStatus.observe(viewLifecycleOwner){ user ->
+            handleLogin(user.loginStatus)
+        }
+
+        authenticationViewModel.facebookLoginStatus.observe(viewLifecycleOwner){ user ->
+            handleLogin(user.loginStatus)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -73,25 +84,11 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
                 override fun onSuccess(result: LoginResult) {
                     Log.d("Facebook-OAuth","facebook:onSuccess:$result")
-                    Auth.handleFacebookLogin(result.accessToken){ firebaseUser ->
-                        if(firebaseUser == null){
-                            Utilities.displayToast(requireContext(),"Authentication Failed")
-                        }
-                        else{
-                            Database.getUserFromDB {
-                                var user = Utilities.createUserFromHashMap(it)
-                                goToHomePage()
-                            }
-                        }
-                    }
+                    authenticationViewModel.loginWithFacebook(result.accessToken)
                 }
 
             })
         }
-    }
-
-    private fun goToHomePage() {
-        authenticationViewModel.setGoToHome(true)
     }
 
     private fun login() {
@@ -100,23 +97,26 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         val password = binding.passwordTextEdit
 
         if(Validators.logInValidator(email,password)){
-            Auth.signInWithEmailAndPassword(email.text.toString(),password.text.toString()){ firebaseUser ->
-                if(firebaseUser == null) {
-                    Utilities.displayToast(requireContext(),"Sign In Failed")
-                }
-                else{
-                    Utilities.displayToast(requireContext(),"Sign in success")
-                    Database.getUserFromDB {
-                        val user = Utilities.createUserFromHashMap(it)
-                        Log.i("Auth","User object $user")
-                    }
-                    goToHomePage()
-                }
-                dialog.dismiss()
-            }
+            authenticationViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
         }
         else{
             dialog.dismiss()
         }
+    }
+
+    private fun handleLogin(status:Boolean){
+        if(status) {
+            Utilities.displayToast(requireContext(),"Sign in success")
+            Database.getUserFromDB {
+                val user = Utilities.createUserFromHashMap(it)
+                Log.i("Auth","User object $user")
+            }
+            authenticationViewModel.setGoToHome(true)
+        }
+        else {
+            Log.d("Auth","Authentication Failed")
+            Utilities.displayToast(requireContext(),"Authentication Failed")
+        }
+        dialog.dismiss()
     }
 }

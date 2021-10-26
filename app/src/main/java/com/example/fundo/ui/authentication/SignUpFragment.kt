@@ -4,17 +4,17 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.databinding.SignUpFragmentBinding
 import com.example.fundo.models.User
 import com.example.fundo.services.Auth
-import com.example.fundo.services.Database
 import com.example.fundo.ui.home.HomeActivity
 import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
+import com.example.fundo.viewmodels.AuthenticationViewModel
+import com.example.fundo.viewmodels.AuthenticationViewModelFactory
 
 class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
     private lateinit var binding : SignUpFragmentBinding

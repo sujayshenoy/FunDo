@@ -27,7 +27,8 @@
         </activity>
         <activity
             android:name=".ui.authentication.AuthenticationActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:theme="@style/Theme.Fundo.CustomToolBar"/>
         <activity
             android:name=".ui.home.HomeActivity"
             android:exported="true"

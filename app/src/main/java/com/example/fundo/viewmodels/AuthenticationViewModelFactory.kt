@@ -1,4 +1,4 @@
-package com.example.fundo.ui.authentication
+package com.example.fundo.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

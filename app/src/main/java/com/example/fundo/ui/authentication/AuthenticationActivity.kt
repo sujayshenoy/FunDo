@@ -8,6 +8,8 @@ import com.example.fundo.R
 import com.example.fundo.databinding.AuthBinding
 import com.example.fundo.ui.home.HomeActivity
 import com.example.fundo.utils.Utilities
+import com.example.fundo.viewmodels.AuthenticationViewModel
+import com.example.fundo.viewmodels.AuthenticationViewModelFactory
 
 class AuthenticationActivity : AppCompatActivity() {
     private lateinit var binding: AuthBinding

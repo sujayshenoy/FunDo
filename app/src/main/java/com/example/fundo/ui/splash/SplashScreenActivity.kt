@@ -7,7 +7,7 @@ import com.example.fundo.databinding.SplashScreenBinding
 import com.example.fundo.services.Auth
 import com.example.fundo.services.Database
 import com.example.fundo.ui.authentication.AuthenticationActivity
-import com.example.fundo.ui.authentication.AuthenticationViewModel
+import com.example.fundo.viewmodels.AuthenticationViewModel
 import com.example.fundo.ui.home.HomeActivity
 
 class SplashScreenActivity: AppCompatActivity() {
@@ -22,7 +22,7 @@ class SplashScreenActivity: AppCompatActivity() {
 
         val splashScreenIcon = binding.splashScreenIcon
         splashScreenIcon.alpha = 0f
-        splashScreenIcon.animate().setDuration(1500).alpha(1f).withEndAction{
+        splashScreenIcon.animate().setDuration(10).alpha(1f).withEndAction{
             if(Auth.getCurrentUser() == null){
                 val intent = Intent(this, AuthenticationActivity::class.java)
                 finish()

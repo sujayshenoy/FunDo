@@ -15,7 +15,7 @@ import com.google.firebase.ktx.Firebase
 object Auth {
     private val auth : FirebaseAuth = Firebase.auth
 
-    fun getCurrentUser() = auth.currentUser //null if no user signed in
+    fun getCurrentUser() = auth.currentUser
 
     fun signUpWithEmailAndPassword(user: User, password:String, callback: (FirebaseUser?) -> Unit) {
         auth.createUserWithEmailAndPassword(user.email,password).addOnCompleteListener {
@@ -32,45 +32,52 @@ object Auth {
         }
     }
 
-    fun signInWithEmailAndPassword(email: String,password: String,callback: (FirebaseUser?) -> Unit){
+    fun signInWithEmailAndPassword(email: String,password: String,callback: (User?) -> Unit){
         if(getCurrentUser() != null){
             Log.i("Auth","User already logged in")
-            callback(getCurrentUser())
+            val curUser = getCurrentUser()
+            val user = User(curUser?.displayName.toString(),curUser?.email.toString(),curUser?.phoneNumber.toString(),true)
+            callback(user)
             return
         }
 
         auth.signInWithEmailAndPassword(email,password).addOnCompleteListener {
+            var user:User?
             if(it.isSuccessful){
                 Log.i("Auth","Authentication Successful ${getCurrentUser()}")
-                callback(getCurrentUser())
+                val curUser = getCurrentUser()
+                user = User(curUser?.displayName.toString(),curUser?.email.toString(),curUser?.phoneNumber.toString(),true)
+                callback(user)
             }
             else{
                 Log.i("Auth","Authentication Failed ${it.exception}")
-                callback(null)
+                user = User("","","",false)
+                callback(user)
             }
         }
     }
 
-    fun handleFacebookLogin(accessToken: AccessToken, callback: (FirebaseUser?) -> Unit) {
+    fun handleFacebookLogin(accessToken: AccessToken, callback: (User?) -> Unit) {
         Log.d("Facebook-OAuth",accessToken.toString())
 
         var credential = FacebookAuthProvider.getCredential(accessToken.token)
         auth.signInWithCredential(credential)
             .addOnCompleteListener {
+                var user: User?
                 if(it.isSuccessful){
                     Log.d("Auth","signInWithCredential;success")
-                    var firebaseUser = getCurrentUser()
-                    var email = firebaseUser?.email.toString()
-                    var name = firebaseUser?.displayName.toString()
-                    var phone = firebaseUser?.phoneNumber.toString()
+                    var curUser = getCurrentUser()
+                    var email = curUser?.email.toString()
+                    var name = curUser?.displayName.toString()
+                    var phone = curUser?.phoneNumber.toString()
 
                     var user = User(name,email,phone)
-                    Database.addUserToDB(user)
-                    callback(getCurrentUser())
+                    callback(user)
                 }
                 else{
-                    Log.d("Auth","signInWithCredential:failure",it.exception)
-                    callback(null)
+                    Log.i("Auth","Authentication Failed ${it.exception}")
+                    user = User("","","",false)
+                    callback(user)
                 }
             }
     }
