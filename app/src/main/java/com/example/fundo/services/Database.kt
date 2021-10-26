@@ -1,7 +1,7 @@
 package com.example.fundo.services
 
 import android.util.Log
-import com.example.fundo.models.User
+import com.example.fundo.models.DBUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -10,7 +10,7 @@ import javax.security.auth.callback.Callback
 object Database {
     private val database = Firebase.database.reference
 
-    fun addUserToDB(user : User){
+    fun addUserToDB(user : DBUser){
         database.child("users").child(Auth.getCurrentUser()?.uid.toString()).setValue(user).addOnCompleteListener {
             if(!it.isSuccessful){
                 Log.e("DB","Write Failed")

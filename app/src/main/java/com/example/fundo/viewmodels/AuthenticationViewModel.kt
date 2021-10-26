@@ -3,8 +3,12 @@ package com.example.fundo.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.fundo.R
 import com.example.fundo.models.User
 import com.example.fundo.services.Auth
+import com.example.fundo.services.Database
+import com.example.fundo.ui.authentication.LoginFragment
+import com.example.fundo.utils.Utilities
 import com.facebook.AccessToken
 
 class AuthenticationViewModel:ViewModel() {
@@ -14,6 +18,8 @@ class AuthenticationViewModel:ViewModel() {
     private val _goToHome = MutableLiveData<Boolean>()
     private val _emailPassLoginStatus = MutableLiveData<User>()
     private val _facebookLoginStatus = MutableLiveData<User>()
+    private val _emailPassSignUpStatus = MutableLiveData<Boolean>()
+    private val _resetPasswordStatus = MutableLiveData<Boolean>()
 
     val goToLoginScreen = _goToLoginScreen as LiveData<Boolean>
     val goToSignUpScreen = _goToSignUpScreen as LiveData<Boolean>
@@ -21,6 +27,8 @@ class AuthenticationViewModel:ViewModel() {
     val goToHome = _goToHome as LiveData<Boolean>
     val emailPassLoginStatus = _emailPassLoginStatus as LiveData<User>
     val facebookLoginStatus = _facebookLoginStatus as LiveData<User>
+    val emailPassSignUpStatus = _emailPassSignUpStatus as LiveData<Boolean>
+    val resetPasswordStatus = _resetPasswordStatus as LiveData<Boolean>
 
     fun setGoToLoginScreenStatus(flag:Boolean){
         _goToLoginScreen.value = flag
@@ -50,4 +58,15 @@ class AuthenticationViewModel:ViewModel() {
         }
     }
 
+    fun signUpWithEmailAndPassword(email: String,password: String) {
+        Auth.signUpWithEmailAndPassword(email,password){
+            _emailPassSignUpStatus.value = it
+        }
+    }
+
+    fun resetPassword(email:String) {
+        Auth.resetPassword(email){
+            _resetPasswordStatus.value = it
+        }
+    }
 }

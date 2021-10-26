@@ -9,9 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.databinding.LoginFragmentBinding
-import com.example.fundo.services.Auth
-import com.example.fundo.services.Database
-import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
 import com.example.fundo.viewmodels.AuthenticationViewModel
 import com.example.fundo.viewmodels.AuthenticationViewModelFactory
@@ -22,7 +19,6 @@ import com.facebook.login.LoginResult
 
 class LoginFragment : Fragment(R.layout.login_fragment) {
     private lateinit var binding:LoginFragmentBinding
-    private lateinit var dialog:Dialog
     private lateinit var callbackManager:CallbackManager
     private lateinit var authenticationViewModel: AuthenticationViewModel
 
@@ -38,17 +34,6 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         callbackManager = CallbackManager.Factory.create()
 
         attachListeners()
-        attachObservers()
-    }
-
-    private fun attachObservers() {
-        authenticationViewModel.emailPassLoginStatus.observe(viewLifecycleOwner){ user ->
-            handleLogin(user.loginStatus)
-        }
-
-        authenticationViewModel.facebookLoginStatus.observe(viewLifecycleOwner){ user ->
-            handleLogin(user.loginStatus)
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -86,7 +71,6 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
                     Log.d("Facebook-OAuth","facebook:onSuccess:$result")
                     authenticationViewModel.loginWithFacebook(result.accessToken)
                 }
-
             })
         }
     }
@@ -104,19 +88,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         }
     }
 
-    private fun handleLogin(status:Boolean){
-        if(status) {
-            Utilities.displayToast(requireContext(),"Sign in success")
-            Database.getUserFromDB {
-                val user = Utilities.createUserFromHashMap(it)
-                Log.i("Auth","User object $user")
-            }
-            authenticationViewModel.setGoToHome(true)
-        }
-        else {
-            Log.d("Auth","Authentication Failed")
-            Utilities.displayToast(requireContext(),"Authentication Failed")
-        }
-        dialog.dismiss()
+    companion object{
+        lateinit var dialog:Dialog
     }
 }

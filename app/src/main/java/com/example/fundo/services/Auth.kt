@@ -17,17 +17,16 @@ object Auth {
 
     fun getCurrentUser() = auth.currentUser
 
-    fun signUpWithEmailAndPassword(user: User, password:String, callback: (FirebaseUser?) -> Unit) {
-        auth.createUserWithEmailAndPassword(user.email,password).addOnCompleteListener {
+    fun signUpWithEmailAndPassword(email: String, password:String, callback: (Boolean) -> Unit) {
+        auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener {
             if(it.isSuccessful){
                 Log.i("Auth","Sign Up Successful")
-                Database.addUserToDB(user)
-                callback(getCurrentUser())
+                callback(true)
             }
             else{
                 Log.e("Auth","Something Went Wrong!! Please Try Again")
                 Log.e("Auth",it.exception.toString())
-                callback(null)
+                callback(false)
             }
         }
     }
@@ -87,13 +86,13 @@ object Auth {
         LoginManager.getInstance().logOut()
     }
 
-    fun resetPassword(email:String,callback: (String) -> Unit) {
+    fun resetPassword(email:String,callback: (Boolean) -> Unit) {
         auth.sendPasswordResetEmail(email).addOnCompleteListener {
             if(it.isSuccessful){
-                callback("Password reset link has been sent to $email")
+                callback(true)
             }
             else{
-                callback("Email not registered! Please register from registration screen")
+                callback(false)
             }
         }
     }
