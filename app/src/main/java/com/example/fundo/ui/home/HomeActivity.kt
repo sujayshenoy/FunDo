@@ -3,19 +3,24 @@ package com.example.fundo.ui.home
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import com.example.fundo.R
 import com.example.fundo.databinding.ActivityHomeBinding
 import com.example.fundo.services.Auth
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.utils.Utilities
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding:ActivityHomeBinding
     private lateinit var toggle:ActionBarDrawerToggle
+    private lateinit var alertDialog: AlertDialog
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu,menu)
@@ -27,12 +32,18 @@ class HomeActivity : AppCompatActivity() {
             return true
         }
 
-        Utilities.displayToast(this,"Item id selected ${item.itemId}")
-
         when(item.itemId){
-            R.id.profileMenu -> Utilities.displayToast(this,"Profile Icon clicked")
+            R.id.profileMenu -> showProfile()
         }
         return true
+    }
+
+    private fun showProfile() {
+        alertDialog.show()
+    }
+
+    private fun dismissProfile() {
+        alertDialog.dismiss()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,11 +58,10 @@ class HomeActivity : AppCompatActivity() {
         toggle.isDrawerIndicatorEnabled = true
         toggle.syncState()
 
+        createProfileOverlay()
+
         binding.logOutButton.setOnClickListener{
-            Auth.signOut()
-            var intent = Intent(this@HomeActivity,AuthenticationActivity::class.java)
-            finish()
-            startActivity(intent)
+            logout()
         }
 
         binding.navigationDrawer.setNavigationItemSelectedListener(object:NavigationView.OnNavigationItemSelectedListener{
@@ -72,5 +82,29 @@ class HomeActivity : AppCompatActivity() {
 
             true
         }
+    }
+
+    private fun createProfileOverlay() {
+        val profileView = LayoutInflater.from(this@HomeActivity).inflate(R.layout.user_profile,null)
+        alertDialog = AlertDialog.Builder(this)
+            .setView(profileView)
+            .create()
+
+        val dialogLogoutButton:MaterialButton = profileView.findViewById(R.id.userLogout)
+        dialogLogoutButton.setOnClickListener{
+            logout()
+        }
+
+        val closeOverlayButton:ImageView = profileView.findViewById(R.id.closeOverlayButton)
+        closeOverlayButton.setOnClickListener{
+            dismissProfile()
+        }
+    }
+
+    private fun logout() {
+        Auth.signOut()
+        var intent = Intent(this@HomeActivity,AuthenticationActivity::class.java)
+        finish()
+        startActivity(intent)
     }
 }

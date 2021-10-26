@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="300dp"
+    android:id="@+id/userProfileLayout"
+    android:padding="20dp">
+
+    <ImageView
+        android:id="@+id/closeOverlayButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/close_icon"/>
+
+    <ImageView
+        android:id="@+id/profileIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/profile_icon_large"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        />
+
+    <TextView
+        android:id="@+id/userNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textSize="30sp"
+        android:layout_below="@id/profileIcon"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/userEmailText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="email@email.com"
+        android:textSize="20sp"
+        android:layout_below="@id/userNameText"
+        android:layout_centerHorizontal="true"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/userLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/userEmailText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Logout"
+        android:textColor="@color/material_text_color"/>
+</RelativeLayout>
