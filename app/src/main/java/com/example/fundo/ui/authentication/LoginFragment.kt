@@ -9,9 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.databinding.LoginFragmentBinding
+import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
 import com.example.fundo.viewmodels.AuthenticationViewModel
 import com.example.fundo.viewmodels.AuthenticationViewModelFactory
+import com.example.fundo.viewmodels.LoginViewModel
+import com.example.fundo.viewmodels.LoginViewModelFactory
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -20,7 +23,8 @@ import com.facebook.login.LoginResult
 class LoginFragment : Fragment(R.layout.login_fragment) {
     private lateinit var binding:LoginFragmentBinding
     private lateinit var callbackManager:CallbackManager
-    private lateinit var authenticationViewModel: AuthenticationViewModel
+    private lateinit var loginViewModel: LoginViewModel
+    private lateinit var authenticationViewModel:AuthenticationViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -28,12 +32,26 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         binding = LoginFragmentBinding.bind(view)
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.loading_dialog)
+        loginViewModel = ViewModelProvider(this,
+            LoginViewModelFactory()
+        )[LoginViewModel::class.java]
         authenticationViewModel = ViewModelProvider(requireActivity(),
             AuthenticationViewModelFactory()
         )[AuthenticationViewModel::class.java]
         callbackManager = CallbackManager.Factory.create()
 
         attachListeners()
+        attachObservers()
+    }
+
+    private fun attachObservers() {
+        loginViewModel.emailPassLoginStatus.observe(viewLifecycleOwner){ user ->
+            handleLogin(user.loginStatus)
+        }
+
+        loginViewModel.facebookLoginStatus.observe(viewLifecycleOwner){ user ->
+            handleLogin(user.loginStatus)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -69,7 +87,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
                 override fun onSuccess(result: LoginResult) {
                     Log.d("Facebook-OAuth","facebook:onSuccess:$result")
-                    authenticationViewModel.loginWithFacebook(result.accessToken)
+                    loginViewModel.loginWithFacebook(result.accessToken)
                 }
             })
         }
@@ -81,11 +99,23 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         val password = binding.passwordTextEdit
 
         if(Validators.logInValidator(email,password)){
-            authenticationViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
+            loginViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
         }
         else{
             dialog.dismiss()
         }
+    }
+
+    private fun handleLogin(status:Boolean){
+        if(status) {
+            Utilities.displayToast(requireContext(),"Sign in success")
+            authenticationViewModel.setGoToHome(true)
+        }
+        else {
+            Log.d("Auth","Authentication Failed")
+            Utilities.displayToast(requireContext(),"Authentication Failed")
+        }
+        dialog.dismiss()
     }
 
     companion object{

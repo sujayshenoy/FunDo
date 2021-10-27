@@ -9,6 +9,7 @@ import com.example.fundo.services.Database
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.viewmodels.AuthenticationViewModel
 import com.example.fundo.ui.home.HomeActivity
+import com.example.fundo.utils.SharedPrefUtil
 
 class SplashScreenActivity: AppCompatActivity() {
     private lateinit var binding: SplashScreenBinding
@@ -20,6 +21,7 @@ class SplashScreenActivity: AppCompatActivity() {
         binding = SplashScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        SharedPrefUtil.initSharedPref(this)
         val splashScreenIcon = binding.splashScreenIcon
         splashScreenIcon.alpha = 0f
         splashScreenIcon.animate().setDuration(10).alpha(1f).withEndAction{

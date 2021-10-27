@@ -4,6 +4,7 @@ import android.util.Log
 import android.webkit.ValueCallback
 import android.widget.Toast
 import com.example.fundo.models.User
+import com.example.fundo.utils.SharedPrefUtil
 import com.example.fundo.utils.Utilities
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
@@ -81,9 +82,11 @@ object Auth {
             }
     }
 
-    fun signOut() {
+    fun signOut(callback: (Boolean) -> Unit) {
+        SharedPrefUtil.clearAll()
         auth.signOut()
         LoginManager.getInstance().logOut()
+        callback(true)
     }
 
     fun resetPassword(email:String,callback: (Boolean) -> Unit) {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -14,7 +15,6 @@
         android:layout_gravity="start" />
 
     <RelativeLayout
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.home.HomeActivity">
@@ -36,26 +36,6 @@
                 app:navigationIcon="@drawable/drawer_menu"
                 app:title="@string/app_name" />
         </com.google.android.material.appbar.AppBarLayout>
-
-
-        <TextView
-            android:id="@+id/mainActivityText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Home Activity"
-            android:textSize="40sp" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logOutButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Logout"
-            android:textColor="@color/material_text_color"
-            android:textSize="20sp"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/mainActivityText"
-            android:layout_marginTop="10dp"/>
     </RelativeLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>
