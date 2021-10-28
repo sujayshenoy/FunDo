@@ -3,14 +3,6 @@ package com.example.fundo.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.fundo.R
-import com.example.fundo.models.DBUser
-import com.example.fundo.models.User
-import com.example.fundo.services.Auth
-import com.example.fundo.services.Database
-import com.example.fundo.ui.authentication.LoginFragment
-import com.example.fundo.utils.Utilities
-import com.facebook.AccessToken
 
 class AuthenticationSharedViewModel():ViewModel() {
     private val _goToLoginScreen = MutableLiveData<Boolean>()

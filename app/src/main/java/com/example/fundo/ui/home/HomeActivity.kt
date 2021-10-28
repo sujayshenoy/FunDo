@@ -3,7 +3,6 @@ package com.example.fundo.ui.home
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -21,7 +20,6 @@ import com.example.fundo.utils.Utilities
 import com.example.fundo.viewmodels.HomeViewModel
 import com.example.fundo.viewmodels.HomeViewModelFactory
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.navigation.NavigationView
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding:ActivityHomeBinding
