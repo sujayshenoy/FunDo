@@ -3,8 +3,8 @@ package com.example.fundo.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-class AuthenticationViewModelFactory:ViewModelProvider.Factory {
+class AuthenticationSharedViewModelFactory:ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return AuthenticationViewModel() as T
+        return AuthenticationSharedViewModel() as T
     }
 }

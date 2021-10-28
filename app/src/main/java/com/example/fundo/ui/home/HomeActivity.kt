@@ -3,6 +3,7 @@ package com.example.fundo.ui.home
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -10,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.databinding.ActivityHomeBinding
@@ -33,10 +35,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(toggle.onOptionsItemSelected(item)){
-            return true
-        }
-
         when(item.itemId){
             R.id.profileMenu -> showProfile()
         }
@@ -58,19 +56,21 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
         homeViewModel = ViewModelProvider(this,HomeViewModelFactory())[HomeViewModel::class.java]
 
+        createProfileOverlay()
+        createNavigationDrawer()
+        attachObservers()
+    }
+
+    private fun createNavigationDrawer() {
         setSupportActionBar(binding.toolBar)
         toggle = ActionBarDrawerToggle(this,binding.drawerLayout,binding.toolBar,R.string.open,R.string.close)
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.isDrawerIndicatorEnabled = true
         toggle.syncState()
 
-        createProfileOverlay()
-
-        binding.navigationDrawer.setNavigationItemSelectedListener(object:NavigationView.OnNavigationItemSelectedListener{
-            override fun onNavigationItemSelected(item: MenuItem): Boolean {
-                TODO("Not yet implemented")
-            }
-        })
+        val headerView = binding.navigationDrawer.getHeaderView(0)
+        val userNameTextView: TextView = headerView.findViewById(R.id.userNameText)
+        userNameTextView.text = SharedPrefUtil.getUserName()
 
         binding.navigationDrawer.setNavigationItemSelectedListener {
             when(it.itemId){
@@ -78,21 +78,24 @@ class HomeActivity : AppCompatActivity() {
                 R.id.reminders -> Utilities.displayToast(this,"Reminders Selected")
                 R.id.settings -> Utilities.displayToast(this,"Settings Selected")
                 R.id.about -> Utilities.displayToast(this,"About Selected")
-                R.id.logout -> Utilities.displayToast(this,"Logout Selected")
+                R.id.logout -> homeViewModel.logout()
             }
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
 
             true
         }
-
-        attachObservers()
     }
 
     private fun attachObservers() {
-        homeViewModel.logoutStatus.observe(this){
+        homeViewModel.goToAuthenticationActivity.observe(this){
             var intent = Intent(this@HomeActivity,AuthenticationActivity::class.java)
             dismissProfile()
             finish()
             startActivity(intent)
+        }
+
+        homeViewModel.logoutStatus.observe(this){
+            homeViewModel.setGoToAuthenticationActivity(true)
         }
     }
 
@@ -115,7 +118,7 @@ class HomeActivity : AppCompatActivity() {
         val userNameText:TextView = profileView.findViewById(R.id.userNameText)
         val userEmailText:TextView = profileView.findViewById(R.id.userEmailText)
 
-        userNameText.text = SharedPrefUtil.getString("userName")
-        userEmailText.text = SharedPrefUtil.getString("userEmail")
+        userNameText.text = SharedPrefUtil.getUserName()
+        userEmailText.text = SharedPrefUtil.getUserEmail()
     }
 }

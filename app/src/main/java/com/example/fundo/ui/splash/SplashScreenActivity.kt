@@ -7,13 +7,13 @@ import com.example.fundo.databinding.SplashScreenBinding
 import com.example.fundo.services.Auth
 import com.example.fundo.services.Database
 import com.example.fundo.ui.authentication.AuthenticationActivity
-import com.example.fundo.viewmodels.AuthenticationViewModel
+import com.example.fundo.viewmodels.AuthenticationSharedViewModel
 import com.example.fundo.ui.home.HomeActivity
 import com.example.fundo.utils.SharedPrefUtil
 
 class SplashScreenActivity: AppCompatActivity() {
     private lateinit var binding: SplashScreenBinding
-    private lateinit var authenticationViewModel: AuthenticationViewModel
+    private lateinit var authenticationSharedViewModel: AuthenticationSharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

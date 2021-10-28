@@ -9,14 +9,14 @@ import com.example.fundo.R
 import com.example.fundo.databinding.ForgotPasswordBinding
 import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
-import com.example.fundo.viewmodels.AuthenticationViewModel
-import com.example.fundo.viewmodels.AuthenticationViewModelFactory
+import com.example.fundo.viewmodels.AuthenticationSharedViewModel
+import com.example.fundo.viewmodels.AuthenticationSharedViewModelFactory
 import com.example.fundo.viewmodels.ResetPasswordViewModel
 import com.example.fundo.viewmodels.ResetPasswordViewModelFactory
 
 class ResetPasswordFragment:Fragment(R.layout.forgot_password) {
     private lateinit var binding:ForgotPasswordBinding
-    private lateinit var authenticationViewModel: AuthenticationViewModel
+    private lateinit var authenticationSharedViewModel: AuthenticationSharedViewModel
     private lateinit var resetPasswordViewModel: ResetPasswordViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -25,19 +25,22 @@ class ResetPasswordFragment:Fragment(R.layout.forgot_password) {
         binding = ForgotPasswordBinding.bind(view)
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.loading_dialog)
-        authenticationViewModel = ViewModelProvider(requireActivity(),
-            AuthenticationViewModelFactory()
-        )[AuthenticationViewModel::class.java]
 
+        authenticationSharedViewModel = ViewModelProvider(requireActivity(),
+            AuthenticationSharedViewModelFactory()
+        )[AuthenticationSharedViewModel::class.java]
         resetPasswordViewModel = ViewModelProvider(this,
             ResetPasswordViewModelFactory()
         )[ResetPasswordViewModel::class.java]
 
+        attachListeners()
+        attachObservers()
+    }
+
+    private fun attachListeners() {
         binding.resetPasswordButton.setOnClickListener{
             resetPassword(binding.emailTextEdit.text.toString())
         }
-
-        attachObservers()
     }
 
     private fun attachObservers() {
@@ -48,7 +51,7 @@ class ResetPasswordFragment:Fragment(R.layout.forgot_password) {
             else{
                 Utilities.displayToast(requireContext(),"User not registered")
             }
-            authenticationViewModel.setGoToLoginScreenStatus(true)
+            authenticationSharedViewModel.setGoToLoginScreenStatus(true)
             dialog.dismiss()
         }
     }

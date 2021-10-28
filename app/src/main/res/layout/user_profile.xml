@@ -28,6 +28,7 @@
         android:layout_below="@id/profileIcon"
         android:layout_centerHorizontal="true"
         android:text="Name"
+        android:textStyle="bold"
         android:textSize="30sp" />
 
     <TextView

@@ -20,6 +20,12 @@ object SharedPrefUtil {
 
     fun getString(key:String):String? = sharedPreferences.getString(key, key)
 
+    fun getUserName():String? = sharedPreferences.getString("userName","Name")
+
+    fun getUserEmail():String? = sharedPreferences.getString("userEmail","Email")
+
+    fun getUserPhone():String? = sharedPreferences.getString("userPhone","Phone")
+
     fun clearAll() {
         val editor = sharedPreferences.edit()
         editor.clear()

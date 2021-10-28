@@ -10,13 +10,13 @@ import com.example.fundo.databinding.SignUpFragmentBinding
 import com.example.fundo.models.User
 import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
-import com.example.fundo.viewmodels.AuthenticationViewModel
-import com.example.fundo.viewmodels.AuthenticationViewModelFactory
+import com.example.fundo.viewmodels.AuthenticationSharedViewModel
+import com.example.fundo.viewmodels.AuthenticationSharedViewModelFactory
 import com.example.fundo.viewmodels.SignUpViewModel
 import com.example.fundo.viewmodels.SignUpViewModelFactory
 
 class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
-    private lateinit var authenticationViewModel: AuthenticationViewModel
+    private lateinit var authenticationSharedViewModel: AuthenticationSharedViewModel
     private lateinit var signUpViewModel: SignUpViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -25,7 +25,8 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
         binding = SignUpFragmentBinding.bind(view)
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.loading_dialog)
-        authenticationViewModel = ViewModelProvider(requireActivity(), AuthenticationViewModelFactory())[AuthenticationViewModel::class.java]
+
+        authenticationSharedViewModel = ViewModelProvider(requireActivity(), AuthenticationSharedViewModelFactory())[AuthenticationSharedViewModel::class.java]
         signUpViewModel = ViewModelProvider(this,SignUpViewModelFactory())[SignUpViewModel::class.java]
 
         attachListeners()
@@ -35,7 +36,7 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
     private fun attachObservers() {
         signUpViewModel.emailPassSignUpStatus.observe(viewLifecycleOwner){
             if(it){
-                authenticationViewModel.setGoToHome(true)
+                authenticationSharedViewModel.setGoToHome(true)
             }
             else{
                 Utilities.displayToast(requireContext(),"Something went wrong!! User not registered")
@@ -46,7 +47,7 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
 
     private fun attachListeners() {
         binding.regLogChangeRText.setOnClickListener{
-            authenticationViewModel.setGoToLoginScreenStatus(true)
+            authenticationSharedViewModel.setGoToLoginScreenStatus(true)
         }
 
         binding.signUpButton.setOnClickListener{

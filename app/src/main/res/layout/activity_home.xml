@@ -6,14 +6,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawerLayout">
 
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigationDrawer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:menu="@menu/drawer_menu"
-        app:headerLayout="@layout/drawer_header"
-        android:layout_gravity="start" />
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,5 +29,13 @@
                 app:title="@string/app_name" />
         </com.google.android.material.appbar.AppBarLayout>
     </RelativeLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationDrawer"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:menu="@menu/drawer_menu"
+        app:headerLayout="@layout/drawer_header"
+        android:layout_gravity="start" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

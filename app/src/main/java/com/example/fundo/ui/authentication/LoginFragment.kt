@@ -11,8 +11,8 @@ import com.example.fundo.R
 import com.example.fundo.databinding.LoginFragmentBinding
 import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
-import com.example.fundo.viewmodels.AuthenticationViewModel
-import com.example.fundo.viewmodels.AuthenticationViewModelFactory
+import com.example.fundo.viewmodels.AuthenticationSharedViewModel
+import com.example.fundo.viewmodels.AuthenticationSharedViewModelFactory
 import com.example.fundo.viewmodels.LoginViewModel
 import com.example.fundo.viewmodels.LoginViewModelFactory
 import com.facebook.CallbackManager
@@ -24,21 +24,22 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     private lateinit var binding:LoginFragmentBinding
     private lateinit var callbackManager:CallbackManager
     private lateinit var loginViewModel: LoginViewModel
-    private lateinit var authenticationViewModel:AuthenticationViewModel
+    private lateinit var authenticationSharedViewModel:AuthenticationSharedViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding = LoginFragmentBinding.bind(view)
+        callbackManager = CallbackManager.Factory.create()
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.loading_dialog)
+
         loginViewModel = ViewModelProvider(this,
             LoginViewModelFactory()
         )[LoginViewModel::class.java]
-        authenticationViewModel = ViewModelProvider(requireActivity(),
-            AuthenticationViewModelFactory()
-        )[AuthenticationViewModel::class.java]
-        callbackManager = CallbackManager.Factory.create()
+        authenticationSharedViewModel = ViewModelProvider(requireActivity(),
+            AuthenticationSharedViewModelFactory()
+        )[AuthenticationSharedViewModel::class.java]
 
         attachListeners()
         attachObservers()
@@ -62,11 +63,11 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
     private fun attachListeners() {
         binding.forgotPasswordText.setOnClickListener{
-            authenticationViewModel.setGoToResetPassword(true)
+            authenticationSharedViewModel.setGoToResetPassword(true)
         }
 
         binding.regLogChangeRText.setOnClickListener{
-            authenticationViewModel.setGoToSignUpScreenStatus(true)
+            authenticationSharedViewModel.setGoToSignUpScreenStatus(true)
         }
 
         binding.loginButton.setOnClickListener{
@@ -109,7 +110,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
     private fun handleLogin(status:Boolean){
         if(status) {
             Utilities.displayToast(requireContext(),"Sign in success")
-            authenticationViewModel.setGoToHome(true)
+            authenticationSharedViewModel.setGoToHome(true)
         }
         else {
             Log.d("Auth","Authentication Failed")

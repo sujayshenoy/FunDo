@@ -12,7 +12,7 @@ import com.example.fundo.ui.authentication.LoginFragment
 import com.example.fundo.utils.Utilities
 import com.facebook.AccessToken
 
-class AuthenticationViewModel():ViewModel() {
+class AuthenticationSharedViewModel():ViewModel() {
     private val _goToLoginScreen = MutableLiveData<Boolean>()
     private val _goToSignUpScreen = MutableLiveData<Boolean>()
     private val _goToResetPassword = MutableLiveData<Boolean>()
