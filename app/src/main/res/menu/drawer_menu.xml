@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view"
     >
 
-<!--    <group android:id="@+id/mainContent">-->
+    <group android:id="@+id/mainContent">
         <item
             android:id="@+id/notes"
             android:title="Notes"
@@ -15,9 +16,9 @@
             android:title="Reminders"
             android:icon="@drawable/reminder_icon">
         </item>
-<!--    </group>-->
+    </group>
 
-<!--    <group android:id="@+id/misc">-->
+    <group android:id="@+id/misc">
         <item
             android:id="@+id/settings"
             android:title="Settings"
@@ -29,7 +30,7 @@
             android:title="About"
             android:icon="@drawable/info_icon">
         </item>
-<!--    </group>-->
+    </group>
 
     <item
         android:id="@+id/logout"

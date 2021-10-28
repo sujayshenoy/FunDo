@@ -4,8 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.fundo.databinding.SplashScreenBinding
-import com.example.fundo.services.Auth
-import com.example.fundo.services.Database
+import com.example.fundo.services.AuthService
+import com.example.fundo.services.DatabaseService
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.viewmodels.AuthenticationSharedViewModel
 import com.example.fundo.ui.home.HomeActivity
@@ -25,13 +25,13 @@ class SplashScreenActivity: AppCompatActivity() {
         val splashScreenIcon = binding.splashScreenIcon
         splashScreenIcon.alpha = 0f
         splashScreenIcon.animate().setDuration(10).alpha(1f).withEndAction{
-            if(Auth.getCurrentUser() == null){
+            if(AuthService.getCurrentUser() == null){
                 val intent = Intent(this, AuthenticationActivity::class.java)
                 finish()
                 startActivity(intent)
             }
             else{
-                Database.getUserFromDB {
+                DatabaseService.getUserFromDB {
                     val intent = Intent(this, HomeActivity::class.java)
                     finish()
                     startActivity(intent)

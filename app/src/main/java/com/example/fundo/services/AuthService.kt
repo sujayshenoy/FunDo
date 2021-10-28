@@ -13,7 +13,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 
-object Auth {
+object AuthService {
     private val auth : FirebaseAuth = Firebase.auth
 
     fun getCurrentUser() = auth.currentUser

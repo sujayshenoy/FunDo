@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.fundo.models.User
-import com.example.fundo.services.Auth
-import com.example.fundo.services.Database
+import com.example.fundo.services.AuthService
+import com.example.fundo.services.DatabaseService
 import com.facebook.AccessToken
 
 class LoginViewModel:ViewModel() {
@@ -16,17 +16,17 @@ class LoginViewModel:ViewModel() {
     val facebookLoginStatus = _facebookLoginStatus as LiveData<User>
 
     fun loginWithEmailAndPassword(email:String,password:String) {
-        Auth.signInWithEmailAndPassword(email,password){ user ->
-            Database.getUserFromDB {
+        AuthService.signInWithEmailAndPassword(email,password){ user ->
+            DatabaseService.getUserFromDB {
                 _emailPassLoginStatus.value = user
             }
         }
     }
 
     fun loginWithFacebook(accessToken: AccessToken) {
-        Auth.handleFacebookLogin(accessToken){ user ->
+        AuthService.handleFacebookLogin(accessToken){ user ->
             if (user != null) {
-                Database.addUserToDB(user){
+                DatabaseService.addUserToDB(user){
                     _facebookLoginStatus.value = user
                 }
             }

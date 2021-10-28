@@ -2,6 +2,7 @@ package com.example.fundo.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.fundo.R
 
 object SharedPrefUtil {
     private lateinit var sharedPreferences: SharedPreferences
