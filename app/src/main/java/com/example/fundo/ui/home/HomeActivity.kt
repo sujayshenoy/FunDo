@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -23,10 +24,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.databinding.ActivityHomeBinding
 import com.example.fundo.ui.authentication.AuthenticationActivity
+import com.example.fundo.ui.newnote.NewNoteActivity
 import com.example.fundo.utils.SharedPrefUtil
 import com.example.fundo.utils.Utilities
 import com.example.fundo.viewmodels.HomeViewModel
 import com.example.fundo.viewmodels.HomeViewModelFactory
+import com.example.fundo.wrapper.Note
 import com.google.android.material.button.MaterialButton
 
 class HomeActivity : AppCompatActivity() {
@@ -54,12 +57,30 @@ class HomeActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == PICK_IMAGE_FOR_USERPROFILE_RESULTCODE && data!=null){
-            dialog.show()
-            Log.d("ActivityResult","Data: ${data.data}")
-            val imageUri = data.data
-            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver,imageUri)
-            homeViewModel.setUserAvatar(bitmap)
+        if(requestCode == PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE && data!=null){
+            handleUserImagePickData(data.data)
+        }
+
+        if(requestCode == ADD_NEW_NOTE_REQUESTCODE && data!=null){
+            handleNewNoteData(data.extras)
+        }
+    }
+
+    private fun handleUserImagePickData(imageUri: Uri?) {
+        dialog.show()
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver,imageUri)
+        homeViewModel.setUserAvatar(bitmap)
+    }
+
+    private fun handleNewNoteData(noteBundle: Bundle?) {
+        val title = noteBundle?.getString("title").toString()
+        val content = noteBundle?.getString("content").toString()
+        if(title.isNotEmpty() || content.isNotEmpty()){
+            val newNote = Note(title.toString(),content.toString())
+            noteList.add(newNote)
+        }
+        else{
+            Utilities.displayToast(this@HomeActivity,"Empty Note Discarded")
         }
     }
 
@@ -70,7 +91,7 @@ class HomeActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode == STORAGE_PERMISSION_RESULTCODE && grantResults.isNotEmpty()){
+        if(requestCode == STORAGE_PERMISSION_REQUESTCODE && grantResults.isNotEmpty()){
             if((grantResults[0] != PackageManager.PERMISSION_GRANTED)){
                 Utilities.displayToast(this@HomeActivity,"Storage Access required to upload picture")
             }
@@ -97,6 +118,14 @@ class HomeActivity : AppCompatActivity() {
         createProfileOverlay()
         createNavigationDrawer()
         attachObservers()
+        attachListeners()
+    }
+
+    private fun attachListeners() {
+        binding.addNewNoteFab.setOnClickListener{
+            val intent = Intent(this@HomeActivity,NewNoteActivity::class.java)
+            startActivityForResult(intent, ADD_NEW_NOTE_REQUESTCODE)
+        }
     }
 
     private fun createNavigationDrawer() {
@@ -182,18 +211,20 @@ class HomeActivity : AppCompatActivity() {
             else{
                 Log.d("Permission","Permission not granted")
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    STORAGE_PERMISSION_RESULTCODE)
+                    STORAGE_PERMISSION_REQUESTCODE)
             }
         }
     }
 
     fun pickImageFromGallery(){
         val intent = Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, PICK_IMAGE_FOR_USERPROFILE_RESULTCODE)
+        startActivityForResult(intent, PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE)
     }
 
     companion object{
-        private val STORAGE_PERMISSION_RESULTCODE = 0
-        private val PICK_IMAGE_FOR_USERPROFILE_RESULTCODE = 1
+        private val STORAGE_PERMISSION_REQUESTCODE = 0
+        private val PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE = 1
+        private val ADD_NEW_NOTE_REQUESTCODE = 2
+        private val noteList = mutableListOf<Note>()
     }
 }

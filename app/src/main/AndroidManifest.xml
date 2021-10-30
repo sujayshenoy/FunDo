@@ -35,6 +35,10 @@
             android:exported="true"
             android:theme="@style/Theme.Fundo.CustomToolBar">
         </activity>
+        <activity android:name=".ui.newnote.NewNoteActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Fundo.CustomToolBar">
+        </activity>
 
         <activity
             android:name="com.facebook.FacebookActivity"
