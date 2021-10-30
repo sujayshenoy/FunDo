@@ -21,10 +21,13 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fundo.R
 import com.example.fundo.databinding.ActivityHomeBinding
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.ui.newnote.NewNoteActivity
+import com.example.fundo.utils.NotesRecyclerAdapter
 import com.example.fundo.utils.SharedPrefUtil
 import com.example.fundo.utils.Utilities
 import com.example.fundo.viewmodels.HomeViewModel
@@ -40,6 +43,23 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var dialog:Dialog
     private lateinit var profileOverlayView: View
     private var menu: Menu? = null
+    private lateinit var notesAdapter:NotesRecyclerAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        dialog = Dialog(this)
+        dialog.setContentView(R.layout.loading_dialog)
+        homeViewModel = ViewModelProvider(this,HomeViewModelFactory())[HomeViewModel::class.java]
+
+        createProfileOverlay()
+        createNavigationDrawer()
+        attachObservers()
+        attachListeners()
+        initNotesRecyclerView()
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         this.menu = menu
@@ -66,24 +86,6 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleUserImagePickData(imageUri: Uri?) {
-        dialog.show()
-        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver,imageUri)
-        homeViewModel.setUserAvatar(bitmap)
-    }
-
-    private fun handleNewNoteData(noteBundle: Bundle?) {
-        val title = noteBundle?.getString("title").toString()
-        val content = noteBundle?.getString("content").toString()
-        if(title.isNotEmpty() || content.isNotEmpty()){
-            val newNote = Note(title.toString(),content.toString())
-            noteList.add(newNote)
-        }
-        else{
-            Utilities.displayToast(this@HomeActivity,"Empty Note Discarded")
-        }
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -98,27 +100,12 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun showProfile() {
-        alertDialog.show()
-    }
-
-    private fun dismissProfile() {
-        alertDialog.dismiss()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        binding = ActivityHomeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        dialog = Dialog(this)
-        dialog.setContentView(R.layout.loading_dialog)
-        homeViewModel = ViewModelProvider(this,HomeViewModelFactory())[HomeViewModel::class.java]
-
-        createProfileOverlay()
-        createNavigationDrawer()
-        attachObservers()
-        attachListeners()
+    private fun initNotesRecyclerView() {
+        notesAdapter = NotesRecyclerAdapter(noteList)
+        val notesRecyclerView = binding.notesRecyclerView
+        notesRecyclerView.layoutManager = GridLayoutManager(this,2)
+        notesRecyclerView.setHasFixedSize(true)
+        notesRecyclerView.adapter = notesAdapter
     }
 
     private fun attachListeners() {
@@ -151,6 +138,14 @@ class HomeActivity : AppCompatActivity() {
 
             true
         }
+    }
+
+    private fun showProfile() {
+        alertDialog.show()
+    }
+
+    private fun dismissProfile() {
+        alertDialog.dismiss()
     }
 
     private fun attachObservers() {
@@ -219,6 +214,25 @@ class HomeActivity : AppCompatActivity() {
     fun pickImageFromGallery(){
         val intent = Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE)
+    }
+
+    private fun handleUserImagePickData(imageUri: Uri?) {
+        dialog.show()
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver,imageUri)
+        homeViewModel.setUserAvatar(bitmap)
+    }
+
+    private fun handleNewNoteData(noteBundle: Bundle?) {
+        val title = noteBundle?.getString("title").toString()
+        val content = noteBundle?.getString("content").toString()
+        if(title.isNotEmpty() || content.isNotEmpty()){
+            val newNote = Note(title.toString(),content.toString())
+            noteList.add(newNote)
+            notesAdapter.notifyDataSetChanged()
+        }
+        else{
+            Utilities.displayToast(this@HomeActivity,"Empty Note Discarded")
+        }
     }
 
     companion object{
