@@ -17,7 +17,12 @@ class LoginViewModel:ViewModel() {
 
     fun loginWithEmailAndPassword(email:String,password:String) {
         AuthService.signInWithEmailAndPassword(email,password){ user ->
-            DatabaseService.getUserFromDB {
+            if(user?.loginStatus == true){
+                DatabaseService.getUserFromDB {
+                    _emailPassLoginStatus.value = user
+                }
+            }
+            else{
                 _emailPassLoginStatus.value = user
             }
         }
