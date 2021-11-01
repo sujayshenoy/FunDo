@@ -54,6 +54,7 @@ class HomeActivity : AppCompatActivity() {
         dialog.setContentView(R.layout.loading_dialog)
         homeViewModel = ViewModelProvider(this,HomeViewModelFactory())[HomeViewModel::class.java]
 
+        homeViewModel.getNotesFromDB()
         createProfileOverlay()
         createNavigationDrawer()
         attachObservers()
@@ -173,6 +174,12 @@ class HomeActivity : AppCompatActivity() {
 
             dialog.dismiss()
         }
+
+        homeViewModel.getNotesFromDB.observe(this){
+            noteList.clear()
+            noteList.addAll(it)
+            notesAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun createProfileOverlay() {
@@ -211,7 +218,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    fun pickImageFromGallery(){
+    private fun pickImageFromGallery(){
         val intent = Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE)
     }
@@ -226,8 +233,9 @@ class HomeActivity : AppCompatActivity() {
         val title = noteBundle?.getString("title").toString()
         val content = noteBundle?.getString("content").toString()
         if(title.isNotEmpty() || content.isNotEmpty()){
-            val newNote = Note(title.toString(),content.toString())
+            val newNote = Note(title,content)
             noteList.add(newNote)
+            homeViewModel.addNoteToDB(newNote)
             notesAdapter.notifyDataSetChanged()
         }
         else{

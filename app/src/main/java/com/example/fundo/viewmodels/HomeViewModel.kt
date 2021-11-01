@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.fundo.services.AuthService
+import com.example.fundo.services.DatabaseService
 import com.example.fundo.services.StorageService
+import com.example.fundo.wrapper.Note
 
 class HomeViewModel:ViewModel() {
     private var _logoutStatus = MutableLiveData<Boolean>()
@@ -16,6 +18,12 @@ class HomeViewModel:ViewModel() {
 
     private var _setUserAvatarStatus = MutableLiveData<Bitmap>()
     val setUserAvatarStatus = _setUserAvatarStatus as LiveData<Bitmap>
+
+    private val _addNoteToDB = MutableLiveData<Note>()
+    val addNoteToDB = _addNoteToDB as LiveData<Note>
+
+    private val _getNotesFromDB = MutableLiveData<List<Note>>()
+    val getNotesFromDB = _getNotesFromDB as LiveData<List<Note>>
 
     fun setGoToAuthenticationActivity(status:Boolean) {
         _goToAuthenticationActivity.value = status
@@ -34,6 +42,18 @@ class HomeViewModel:ViewModel() {
             if(it!=null){
                 _setUserAvatarStatus.value = it
             }
+        }
+    }
+
+    fun addNoteToDB(note: Note){
+        DatabaseService.addNoteToDB(note){
+            _addNoteToDB.value = note
+        }
+    }
+
+    fun getNotesFromDB(){
+        DatabaseService.getNotesFromDB {
+            _getNotesFromDB.value = it
         }
     }
 

@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.fundo.models.DBUser
 import com.example.fundo.models.User
 import com.example.fundo.utils.Utilities
+import com.example.fundo.wrapper.Note
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -42,5 +43,40 @@ object DatabaseService {
                     callback(false)
                 }
         }
+    }
+
+    fun addNoteToDB(note: Note, callback: (Note?) -> Unit) {
+        database.child("users").child(AuthService.getCurrentUser()?.uid.toString()).child("notes")
+            .push().setValue(note)
+            .addOnCompleteListener {
+                if(it.isSuccessful){
+                    callback(note)
+                }
+                else{
+                    Log.e("DB","Write Failed")
+                    Log.e("DB",it.exception.toString())
+                    callback(null)
+                }
+            }
+    }
+
+    fun getNotesFromDB(callback: (List<Note>?) -> Unit) {
+        val notes = mutableListOf<Note>()
+        database.child("users").child(AuthService.getCurrentUser()?.uid.toString()).child("notes")
+            .get().addOnCompleteListener {
+                if(it.isSuccessful){
+                    for(i in it.result?.children!!){
+                        val noteHashMap = i.value as HashMap<String,String>
+                        val note = Note(noteHashMap["title"].toString(),noteHashMap["content"].toString())
+                        notes.add(note)
+                    }
+                    callback(notes)
+                }
+                else{
+                    Log.e("DB","Read Failed")
+                    Log.e("DB",it.exception.toString())
+                    callback(null)
+                }
+            }
     }
 }
