@@ -21,8 +21,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.fundo.R
 import com.example.fundo.databinding.ActivityHomeBinding
 import com.example.fundo.ui.authentication.AuthenticationActivity
@@ -71,6 +71,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.profileMenu -> showProfile()
+            R.id.layoutChangeButton -> changeLayout(item)
         }
         return true
     }
@@ -104,7 +105,7 @@ class HomeActivity : AppCompatActivity() {
     private fun initNotesRecyclerView() {
         notesAdapter = NotesRecyclerAdapter(noteList)
         val notesRecyclerView = binding.notesRecyclerView
-        notesRecyclerView.layoutManager = GridLayoutManager(this,2)
+        notesRecyclerView.layoutManager = StaggeredGridLayoutManager(2,1)
         notesRecyclerView.setHasFixedSize(true)
         notesRecyclerView.adapter = notesAdapter
     }
@@ -182,6 +183,18 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun changeLayout(item:MenuItem) {
+        if(layoutFlag){
+            item.setIcon(R.drawable.linear_layout_icon)
+            binding.notesRecyclerView.layoutManager = LinearLayoutManager(this@HomeActivity)
+        }
+        else{
+            item.setIcon(R.drawable.grid_layout_icon)
+            binding.notesRecyclerView.layoutManager = StaggeredGridLayoutManager(2,1)
+        }
+        layoutFlag = !layoutFlag
+    }
+
     private fun createProfileOverlay() {
         profileOverlayView = LayoutInflater.from(this@HomeActivity).inflate(R.layout.user_profile,null)
         alertDialog = AlertDialog.Builder(this)
@@ -248,5 +261,6 @@ class HomeActivity : AppCompatActivity() {
         private val PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE = 1
         private val ADD_NEW_NOTE_REQUESTCODE = 2
         private val noteList = mutableListOf<Note>()
+        private var layoutFlag = true
     }
 }
