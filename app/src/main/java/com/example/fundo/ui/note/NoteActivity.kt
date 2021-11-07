@@ -2,6 +2,7 @@ package com.example.fundo.ui.note
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.fundo.databinding.ActivityNoteBinding
 
@@ -25,8 +26,11 @@ class NoteActivity : AppCompatActivity() {
         val title = intent.extras?.getString("title")
         val content = intent.extras?.getString("content")
 
-        binding.titleTextEdit.setText(title)
-        binding.contentTextEdit.setText(content)
+        if(title != null || content != null){
+            binding.titleTextEdit.setText(title)
+            binding.contentTextEdit.setText(content)
+            binding.deleteButton.visibility = View.VISIBLE
+        }
     }
 
     private fun attachListeners() {

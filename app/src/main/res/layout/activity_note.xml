@@ -19,7 +19,8 @@
         android:src="@drawable/delete_icon"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_alignTop="@id/backButton"/>
+        android:layout_alignTop="@id/backButton"
+        android:visibility="gone"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
