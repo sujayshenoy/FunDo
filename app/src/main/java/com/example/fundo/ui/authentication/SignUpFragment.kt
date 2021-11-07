@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.databinding.SignUpFragmentBinding
-import com.example.fundo.models.User
+import com.example.fundo.wrapper.User
 import com.example.fundo.utils.Utilities
 import com.example.fundo.utils.Validators
 import com.example.fundo.viewmodels.AuthenticationSharedViewModel

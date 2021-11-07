@@ -1,8 +1,9 @@
 package com.example.fundo.services
 
 import android.util.Log
+import com.example.fundo.models.DBNote
 import com.example.fundo.models.DBUser
-import com.example.fundo.models.User
+import com.example.fundo.wrapper.User
 import com.example.fundo.utils.Utilities
 import com.example.fundo.wrapper.Note
 import com.google.firebase.database.ktx.database
@@ -46,10 +47,13 @@ object DatabaseService {
     }
 
     fun addNoteToDB(note: Note, callback: (Note?) -> Unit) {
-        database.child("users").child(AuthService.getCurrentUser()?.uid.toString()).child("notes")
-            .push().setValue(note)
+        val dbNote = DBNote(note.title,note.content)
+        val ref = database.child("users").child(AuthService.getCurrentUser()?.uid.toString()).child("notes")
+            .push()
+        ref.setValue(dbNote)
             .addOnCompleteListener {
                 if(it.isSuccessful){
+                    note.id = ref.key.toString()
                     callback(note)
                 }
                 else{
@@ -67,10 +71,30 @@ object DatabaseService {
                 if(it.isSuccessful){
                     for(i in it.result?.children!!){
                         val noteHashMap = i.value as HashMap<String,String>
-                        val note = Note(noteHashMap["title"].toString(),noteHashMap["content"].toString())
+                        val note = Note(noteHashMap["title"].toString(),noteHashMap["content"].toString(),i.key.toString())
                         notes.add(note)
                     }
                     callback(notes)
+                }
+                else{
+                    Log.e("DB","Read Failed")
+                    Log.e("DB",it.exception.toString())
+                    callback(null)
+                }
+            }
+    }
+
+    fun updateNoteInDB(note: Note, callback: (Note?) -> Unit){
+        val noteMap = mapOf(
+            "title" to note.title,
+            "content" to note.content
+        )
+
+        database.child("users").child(AuthService.getCurrentUser()?.uid.toString())
+            .child("notes").child(note.id).updateChildren(noteMap)
+            .addOnCompleteListener {
+                if(it.isSuccessful){
+                    callback(note)
                 }
                 else{
                     Log.e("DB","Read Failed")

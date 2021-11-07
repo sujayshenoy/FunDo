@@ -25,6 +25,9 @@ class HomeViewModel:ViewModel() {
     private val _getNotesFromDB = MutableLiveData<List<Note>>()
     val getNotesFromDB = _getNotesFromDB as LiveData<List<Note>>
 
+    private val _updateNoteInDB = MutableLiveData<Note>()
+    val updateNoteInDB = _updateNoteInDB as LiveData<Note>
+
     fun setGoToAuthenticationActivity(status:Boolean) {
         _goToAuthenticationActivity.value = status
     }
@@ -47,7 +50,13 @@ class HomeViewModel:ViewModel() {
 
     fun addNoteToDB(note: Note){
         DatabaseService.addNoteToDB(note){
-            _addNoteToDB.value = note
+            _addNoteToDB.value = it
+        }
+    }
+
+    fun updateNoteInDB(note: Note){
+        DatabaseService.updateNoteInDB(note){
+            _updateNoteInDB.value = it
         }
     }
 

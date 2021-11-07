@@ -1,16 +1,12 @@
 package com.example.fundo.services
 
 import android.util.Log
-import android.webkit.ValueCallback
-import android.widget.Toast
-import com.example.fundo.models.User
+import com.example.fundo.wrapper.User
 import com.example.fundo.utils.SharedPrefUtil
-import com.example.fundo.utils.Utilities
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 
 object AuthService {
@@ -42,7 +38,7 @@ object AuthService {
         }
 
         auth.signInWithEmailAndPassword(email,password).addOnCompleteListener {
-            var user:User?
+            var user: User?
             if(it.isSuccessful){
                 Log.i("Auth","Authentication Successful ${getCurrentUser()}")
                 val curUser = getCurrentUser()

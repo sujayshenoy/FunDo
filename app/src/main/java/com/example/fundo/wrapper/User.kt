@@ -1,4 +1,4 @@
-package com.example.fundo.models
+package com.example.fundo.wrapper
 
 import com.example.fundo.services.AuthService
 

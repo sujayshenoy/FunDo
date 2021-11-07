@@ -3,7 +3,7 @@ package com.example.fundo.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.fundo.models.User
+import com.example.fundo.wrapper.User
 import com.example.fundo.services.AuthService
 import com.example.fundo.services.DatabaseService
 import com.facebook.AccessToken

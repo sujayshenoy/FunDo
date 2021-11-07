@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.fundo.R
 import com.example.fundo.databinding.ActivityHomeBinding
 import com.example.fundo.ui.authentication.AuthenticationActivity
-import com.example.fundo.ui.newnote.NoteActivity
+import com.example.fundo.ui.note.NoteActivity
 import com.example.fundo.utils.NotesRecyclerAdapter
 import com.example.fundo.utils.SharedPrefUtil
 import com.example.fundo.utils.Utilities
@@ -114,7 +114,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         if(requestCode == UPDATE_NOTE_REQUESTCODE && data != null){
-            Log.d("Activity result",data.extras.toString())
+            handleNoteUpdate(data.extras)
         }
     }
 
@@ -141,6 +141,7 @@ class HomeActivity : AppCompatActivity() {
             override fun onItemClick(position: Int) {
                 val note = tempList[position]
                 val intent = Intent(this@HomeActivity,NoteActivity::class.java)
+                intent.putExtra("id",note.id)
                 intent.putExtra("title", note.title)
                 intent.putExtra("content",note.content)
                 startActivityForResult(intent, UPDATE_NOTE_REQUESTCODE)
@@ -218,9 +219,26 @@ class HomeActivity : AppCompatActivity() {
 
         homeViewModel.getNotesFromDB.observe(this){
             noteList.clear()
-            tempList.clear()
             noteList.addAll(it)
-            tempList.addAll(it)
+            syncLists()
+            notesAdapter.notifyDataSetChanged()
+        }
+
+        homeViewModel.addNoteToDB.observe(this@HomeActivity){
+            noteList.add(it)
+            syncLists()
+            notesAdapter.notifyDataSetChanged()
+            Log.d("RES","id = ${it.id}")
+        }
+
+        homeViewModel.updateNoteInDB.observe(this@HomeActivity){
+            noteList.map { note ->
+                if(note.id == it.id){
+                    note.title = it.title
+                    note.content = it.content
+                }
+            }
+            syncLists()
             notesAdapter.notifyDataSetChanged()
         }
     }
@@ -288,15 +306,32 @@ class HomeActivity : AppCompatActivity() {
         val title = noteBundle?.getString("title").toString()
         val content = noteBundle?.getString("content").toString()
         if(title.isNotEmpty() || content.isNotEmpty()){
-            val newNote = Note(title,content)
-            noteList.add(newNote)
-            tempList.add(newNote)
+            val newNote = Note(title,content,"")
             homeViewModel.addNoteToDB(newNote)
-            notesAdapter.notifyDataSetChanged()
         }
         else{
             Utilities.displayToast(this@HomeActivity,"Empty Note Discarded")
         }
+    }
+
+    private fun handleNoteUpdate(noteBundle: Bundle?) {
+        val id = noteBundle?.getString("id").toString()
+        val title = noteBundle?.getString("title").toString()
+        val content = noteBundle?.getString("content").toString()
+
+        if(title.isNotEmpty() || content.isNotEmpty()){
+            val updateNote = noteList.find { it.id == id}!!
+            val note = Note(title,content,updateNote.id)
+            homeViewModel.updateNoteInDB(note)
+        }
+        else{
+            TODO("Delete note if both empty")
+        }
+    }
+
+    private fun syncLists(){
+        tempList.clear()
+        tempList.addAll(noteList)
     }
 
     companion object{

@@ -1,14 +1,14 @@
-package com.example.fundo.ui.newnote
+package com.example.fundo.ui.note
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.fundo.databinding.NewNoteBinding
-import com.example.fundo.utils.Utilities
+import com.google.firebase.database.core.utilities.Utilities
 
 class NoteActivity : AppCompatActivity() {
     private lateinit var binding: NewNoteBinding
+    private lateinit var id: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +22,7 @@ class NoteActivity : AppCompatActivity() {
 
     private fun loadDataFromIntent() {
         val intent = intent
+        id = intent.extras?.getString("id").toString()
         val title = intent.extras?.getString("title")
         val content = intent.extras?.getString("content")
 
@@ -35,6 +36,7 @@ class NoteActivity : AppCompatActivity() {
             val content = binding.contentTextEdit.text.toString()
 
             val intent = Intent()
+            intent.putExtra("id",id)
             intent.putExtra("title",title)
             intent.putExtra("content",content)
 
