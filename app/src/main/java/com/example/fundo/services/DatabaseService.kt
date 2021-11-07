@@ -103,4 +103,17 @@ object DatabaseService {
                 }
             }
     }
+
+    fun deleteNoteFromDB(note: Note, callback: (Note?) -> Unit){
+        database.child("users").child(AuthService.getCurrentUser()?.uid.toString())
+            .child("notes").child(note.id).removeValue()
+            .addOnCompleteListener {
+                if(it.isSuccessful){
+                    callback(note)
+                }
+                else{
+                    callback(null)
+                }
+            }
+    }
 }

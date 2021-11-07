@@ -3,17 +3,16 @@ package com.example.fundo.ui.note
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.fundo.databinding.NewNoteBinding
-import com.google.firebase.database.core.utilities.Utilities
+import com.example.fundo.databinding.ActivityNoteBinding
 
 class NoteActivity : AppCompatActivity() {
-    private lateinit var binding: NewNoteBinding
+    private lateinit var binding: ActivityNoteBinding
     private lateinit var id: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = NewNoteBinding.inflate(layoutInflater)
+        binding = ActivityNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         loadDataFromIntent()
@@ -47,5 +46,17 @@ class NoteActivity : AppCompatActivity() {
         binding.backButton.setOnClickListener{
             finish()
         }
+
+        binding.deleteButton.setOnClickListener{
+            val intent = Intent()
+            intent.putExtra("id",id)
+
+            setResult(DELETE_NOTE,intent)
+            finish()
+        }
+    }
+
+    companion object{
+        const val DELETE_NOTE = 0
     }
 }

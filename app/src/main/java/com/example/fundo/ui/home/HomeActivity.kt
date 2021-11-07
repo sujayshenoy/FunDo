@@ -114,7 +114,12 @@ class HomeActivity : AppCompatActivity() {
         }
 
         if(requestCode == UPDATE_NOTE_REQUESTCODE && data != null){
-            handleNoteUpdate(data.extras)
+            if(resultCode == NoteActivity.DELETE_NOTE){
+                handleDeleteNote(data.extras)
+            }
+            else{
+                handleNoteUpdate(data.extras)
+            }
         }
     }
 
@@ -241,6 +246,12 @@ class HomeActivity : AppCompatActivity() {
             syncLists()
             notesAdapter.notifyDataSetChanged()
         }
+
+        homeViewModel.deleteNoteFromDB.observe(this@HomeActivity){
+            noteList.removeIf { note -> note.id == it.id }
+            syncLists()
+            notesAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun changeLayout(item:MenuItem) {
@@ -325,8 +336,14 @@ class HomeActivity : AppCompatActivity() {
             homeViewModel.updateNoteInDB(note)
         }
         else{
-            TODO("Delete note if both empty")
+            handleDeleteNote(noteBundle)
         }
+    }
+
+    private fun handleDeleteNote(noteBundle: Bundle?) {
+        val id = noteBundle?.getString("id").toString()
+        val deleteNote = noteList.find { it.id == id}!!
+        homeViewModel.deleteNoteFromDB(deleteNote)
     }
 
     private fun syncLists(){

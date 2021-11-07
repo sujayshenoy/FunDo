@@ -28,6 +28,9 @@ class HomeViewModel:ViewModel() {
     private val _updateNoteInDB = MutableLiveData<Note>()
     val updateNoteInDB = _updateNoteInDB as LiveData<Note>
 
+    private val _deleteNoteFromDB = MutableLiveData<Note>()
+    val deleteNoteFromDB = _deleteNoteFromDB as LiveData<Note>
+
     fun setGoToAuthenticationActivity(status:Boolean) {
         _goToAuthenticationActivity.value = status
     }
@@ -57,6 +60,12 @@ class HomeViewModel:ViewModel() {
     fun updateNoteInDB(note: Note){
         DatabaseService.updateNoteInDB(note){
             _updateNoteInDB.value = it
+        }
+    }
+
+    fun deleteNoteFromDB(note: Note){
+        DatabaseService.deleteNoteFromDB(note){
+            _deleteNoteFromDB.value = note
         }
     }
 
