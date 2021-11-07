@@ -24,7 +24,7 @@
         android:layout_width="125dp"
         android:layout_height="125dp"
         android:layout_above="@id/userNameText"
-        android:src="@drawable/profile_icon_large"
+        android:layout_alignParentLeft="true"
         android:layout_marginBottom="5dp"
-        android:layout_alignParentLeft="true"/>
+        android:src="@drawable/profile_icon_large" />
 </RelativeLayout>

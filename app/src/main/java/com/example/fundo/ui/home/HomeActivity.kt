@@ -16,6 +16,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
+import androidx.appcompat.widget.SearchView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -65,7 +66,32 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         this.menu = menu
         menuInflater.inflate(R.menu.toolbar_menu,menu)
+        val item = menu?.findItem(R.id.actionSearch)
+        val searchView = item?.actionView as SearchView
+        
+        initActionSearch(searchView)
         return true
+    }
+
+    private fun initActionSearch(searchView: SearchView) {
+        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                tempList.clear()
+                val queryText = newText!!.lowercase()
+                noteList.forEach {
+                    if(it.title.contains(queryText) || it.content.contains(queryText)){
+                        tempList.add(it)
+                    }
+                }
+                notesAdapter.notifyDataSetChanged()
+
+                return false
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -103,7 +129,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun initNotesRecyclerView() {
-        notesAdapter = NotesRecyclerAdapter(noteList)
+        notesAdapter = NotesRecyclerAdapter(tempList)
         val notesRecyclerView = binding.notesRecyclerView
         notesRecyclerView.layoutManager = StaggeredGridLayoutManager(2,1)
         notesRecyclerView.setHasFixedSize(true)
@@ -178,7 +204,9 @@ class HomeActivity : AppCompatActivity() {
 
         homeViewModel.getNotesFromDB.observe(this){
             noteList.clear()
+            tempList.clear()
             noteList.addAll(it)
+            tempList.addAll(it)
             notesAdapter.notifyDataSetChanged()
         }
     }
@@ -248,6 +276,7 @@ class HomeActivity : AppCompatActivity() {
         if(title.isNotEmpty() || content.isNotEmpty()){
             val newNote = Note(title,content)
             noteList.add(newNote)
+            tempList.add(newNote)
             homeViewModel.addNoteToDB(newNote)
             notesAdapter.notifyDataSetChanged()
         }
@@ -261,6 +290,7 @@ class HomeActivity : AppCompatActivity() {
         private val PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE = 1
         private val ADD_NEW_NOTE_REQUESTCODE = 2
         private val noteList = mutableListOf<Note>()
+        private val tempList = mutableListOf<Note>()
         private var layoutFlag = true
     }
 }
