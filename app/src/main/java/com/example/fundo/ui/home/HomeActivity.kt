@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.fundo.R
 import com.example.fundo.databinding.ActivityHomeBinding
 import com.example.fundo.ui.authentication.AuthenticationActivity
-import com.example.fundo.ui.newnote.NewNoteActivity
+import com.example.fundo.ui.newnote.NoteActivity
 import com.example.fundo.utils.NotesRecyclerAdapter
 import com.example.fundo.utils.SharedPrefUtil
 import com.example.fundo.utils.Utilities
@@ -105,12 +105,16 @@ class HomeActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE && data!=null){
+        if(requestCode == PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE && data != null){
             handleUserImagePickData(data.data)
         }
 
-        if(requestCode == ADD_NEW_NOTE_REQUESTCODE && data!=null){
+        if(requestCode == ADD_NEW_NOTE_REQUESTCODE && data != null){
             handleNewNoteData(data.extras)
+        }
+
+        if(requestCode == UPDATE_NOTE_REQUESTCODE && data != null){
+            Log.d("Activity result",data.extras.toString())
         }
     }
 
@@ -133,12 +137,22 @@ class HomeActivity : AppCompatActivity() {
         val notesRecyclerView = binding.notesRecyclerView
         notesRecyclerView.layoutManager = StaggeredGridLayoutManager(2,1)
         notesRecyclerView.setHasFixedSize(true)
+        notesAdapter.setOnItemClickListener(object : NotesRecyclerAdapter.OnItemClickListener{
+            override fun onItemClick(position: Int) {
+                val note = tempList[position]
+                val intent = Intent(this@HomeActivity,NoteActivity::class.java)
+                intent.putExtra("title", note.title)
+                intent.putExtra("content",note.content)
+                startActivityForResult(intent, UPDATE_NOTE_REQUESTCODE)
+            }
+        })
+
         notesRecyclerView.adapter = notesAdapter
     }
 
     private fun attachListeners() {
         binding.addNewNoteFab.setOnClickListener{
-            val intent = Intent(this@HomeActivity,NewNoteActivity::class.java)
+            val intent = Intent(this@HomeActivity,NoteActivity::class.java)
             startActivityForResult(intent, ADD_NEW_NOTE_REQUESTCODE)
         }
     }
@@ -289,6 +303,7 @@ class HomeActivity : AppCompatActivity() {
         private val STORAGE_PERMISSION_REQUESTCODE = 0
         private val PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE = 1
         private val ADD_NEW_NOTE_REQUESTCODE = 2
+        private val UPDATE_NOTE_REQUESTCODE = 3
         private val noteList = mutableListOf<Note>()
         private val tempList = mutableListOf<Note>()
         private var layoutFlag = true

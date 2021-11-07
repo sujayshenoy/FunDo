@@ -20,20 +20,20 @@
             android:id="@+id/titleTextEdit"
             android:layout_width="match_parent"
             android:layout_height="30dp"
+            android:background="@null"
             android:hint="Title"
-            android:textSize="30sp"
-            android:background="@null"/>
+            android:textSize="30sp" />
 
         <EditText
             android:id="@+id/contentTextEdit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Note"
-            android:textSize="20sp"
-            android:background="@null"
             android:layout_below="@id/titleTextEdit"
             android:layout_marginTop="10dp"
-            android:gravity="start"/>
+            android:background="@null"
+            android:gravity="start"
+            android:hint="Note"
+            android:textSize="20sp" />
     </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

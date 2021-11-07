@@ -5,8 +5,9 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.fundo.databinding.NewNoteBinding
+import com.example.fundo.utils.Utilities
 
-class NewNoteActivity : AppCompatActivity() {
+class NoteActivity : AppCompatActivity() {
     private lateinit var binding: NewNoteBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,7 +16,17 @@ class NewNoteActivity : AppCompatActivity() {
         binding = NewNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        loadDataFromIntent()
         attachListeners()
+    }
+
+    private fun loadDataFromIntent() {
+        val intent = intent
+        val title = intent.extras?.getString("title")
+        val content = intent.extras?.getString("content")
+
+        binding.titleTextEdit.setText(title)
+        binding.contentTextEdit.setText(content)
     }
 
     private fun attachListeners() {

@@ -1,6 +1,5 @@
 package com.example.fundo.utils
 
-import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +9,11 @@ import com.example.fundo.R
 import com.example.fundo.wrapper.Note
 
 class NotesRecyclerAdapter(private val notesList:List<Note>): RecyclerView.Adapter<NotesRecyclerAdapter.NotesViewHolder>() {
+    private lateinit var recyclerListener : OnItemClickListener
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.recycler_item,parent,false)
-        return NotesViewHolder(itemView)
+        return NotesViewHolder(itemView,recyclerListener)
     }
 
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
@@ -32,8 +33,23 @@ class NotesRecyclerAdapter(private val notesList:List<Note>): RecyclerView.Adapt
         return notesList.size
     }
 
-    class NotesViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+    class NotesViewHolder(itemView: View,listener: OnItemClickListener): RecyclerView.ViewHolder(itemView){
         val titleText: TextView = itemView.findViewById(R.id.titleTextView)
         val contentText: TextView = itemView.findViewById(R.id.contentTextView)
+
+        init {
+            itemView.setOnClickListener {
+                listener.onItemClick(adapterPosition)
+            }
+        }
     }
+
+    interface OnItemClickListener{
+        fun onItemClick(position: Int)
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener){
+        recyclerListener = listener
+    }
+
 }
