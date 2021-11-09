@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.fundo.databinding.SplashScreenBinding
 import com.example.fundo.services.AuthService
 import com.example.fundo.services.DatabaseService
+import com.example.fundo.services.FirebaseDatabaseService
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.viewmodels.AuthenticationSharedViewModel
 import com.example.fundo.ui.home.HomeActivity

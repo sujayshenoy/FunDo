@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.fundo.wrapper.User
 import com.example.fundo.services.AuthService
 import com.example.fundo.services.DatabaseService
+import com.example.fundo.services.FirebaseDatabaseService
 import com.facebook.AccessToken
 
 class LoginViewModel:ViewModel() {
