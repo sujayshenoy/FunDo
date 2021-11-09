@@ -4,19 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="250dp"
     android:background="@color/app_primary_dark"
-    android:paddingLeft="25dp"
+    android:paddingStart="25dp"
+    android:paddingEnd="25dp"
     android:paddingBottom="10dp">
 
     <TextView
         android:id="@+id/userNameText"
         android:layout_width="wrap_content"
         android:layout_height="70dp"
-        android:gravity="left"
-        android:text="Name"
+        android:gravity="start"
+        android:text="@string/nav_drawer_username"
         android:textColor="@color/material_text_color"
         android:textSize="50sp"
         android:textStyle="bold"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -24,7 +25,7 @@
         android:layout_width="125dp"
         android:layout_height="125dp"
         android:layout_above="@id/userNameText"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_marginBottom="5dp"
         android:src="@drawable/profile_icon_large" />
 </RelativeLayout>

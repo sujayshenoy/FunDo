@@ -7,13 +7,13 @@
     <group android:id="@+id/mainContent">
         <item
             android:id="@+id/notes"
-            android:title="Notes"
+            android:title="@string/nav_drawer_notes"
             android:icon="@drawable/note_icon">
         </item>
 
         <item
             android:id="@+id/reminders"
-            android:title="Reminders"
+            android:title="@string/nav_drawer_reminders"
             android:icon="@drawable/reminder_icon">
         </item>
     </group>
@@ -21,20 +21,20 @@
     <group android:id="@+id/misc">
         <item
             android:id="@+id/settings"
-            android:title="Settings"
+            android:title="@string/nav_drawer_settings"
             android:icon="@drawable/settings_icon">
         </item>
 
         <item
             android:id="@+id/about"
-            android:title="About"
+            android:title="@string/nav_drawer_about"
             android:icon="@drawable/info_icon">
         </item>
     </group>
 
     <item
         android:id="@+id/logout"
-        android:title="Logout"
+        android:title="@string/logout_button_text"
         android:icon="@drawable/logout_icon">
     </item>
 </menu>

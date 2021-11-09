@@ -99,7 +99,7 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
         val email = binding.usernameTextEdit
         val password = binding.passwordTextEdit
 
-        if(Validators.logInValidator(email,password)){
+        if(Validators.logInValidator(requireContext(),email,password)){
             loginViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
         }
         else{
@@ -109,12 +109,12 @@ class LoginFragment : Fragment(R.layout.login_fragment) {
 
     private fun handleLogin(status:Boolean){
         if(status) {
-            Utilities.displayToast(requireContext(),"Sign in success")
+            Utilities.displayToast(requireContext(),getString(R.string.sign_in_success_toast))
             authenticationSharedViewModel.setGoToHome(true)
         }
         else {
             Log.d("Auth","Authentication Failed")
-            Utilities.displayToast(requireContext(),"Authentication Failed")
+            Utilities.displayToast(requireContext(),getString(R.string.sign_in_failed_toast))
         }
         dialog.dismiss()
     }

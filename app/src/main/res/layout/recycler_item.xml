@@ -10,7 +10,7 @@
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Title"
+        android:text="@string/note_title"
         android:textSize="30sp"
         />
 
@@ -20,6 +20,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/titleTextView"
         android:layout_marginTop="2dp"
-        android:text="Content"
+        android:text="@string/note_content"
         android:textSize="20sp" />
 </RelativeLayout>

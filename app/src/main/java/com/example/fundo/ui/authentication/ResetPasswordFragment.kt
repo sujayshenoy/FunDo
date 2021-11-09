@@ -46,10 +46,10 @@ class ResetPasswordFragment:Fragment(R.layout.forgot_password) {
     private fun attachObservers() {
         resetPasswordViewModel.resetPasswordStatus.observe(viewLifecycleOwner){
             if(it){
-                Utilities.displayToast(requireContext(),"Password reset link has been sent to your email")
+                Utilities.displayToast(requireContext(),getString(R.string.password_reset_link_sent_text))
             }
             else{
-                Utilities.displayToast(requireContext(),"User not registered")
+                Utilities.displayToast(requireContext(),getString(R.string.user_not_registered))
             }
             authenticationSharedViewModel.setGoToLoginScreenStatus(true)
             dialog.dismiss()
@@ -57,7 +57,7 @@ class ResetPasswordFragment:Fragment(R.layout.forgot_password) {
     }
 
     private fun resetPassword(email:String) {
-        if(Validators.resetPasswordValidator(binding.emailTextEdit)){
+        if(Validators.resetPasswordValidator(requireContext(),binding.emailTextEdit)){
             dialog.show()
             resetPasswordViewModel.resetPassword(email)
         }

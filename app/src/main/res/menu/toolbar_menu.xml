@@ -3,21 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/actionSearch"
-        android:title="Search"
-        app:showAsAction="always|collapseActionView"
+        android:title="@string/action_search_title"
+        app:showAsAction="ifRoom|collapseActionView"
         android:icon="@drawable/action_search_icon"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         >
     </item>
     <item
         android:id="@+id/layoutChangeButton"
-        android:title="Change Layout"
+        android:title="@string/change_layout_title"
         app:showAsAction="always"
         android:icon="@drawable/grid_layout_icon">
     </item>
     <item
         android:id="@+id/profileMenu"
-        android:title="Profile"
+        android:title="@string/profile_title"
         app:showAsAction="always"
         android:icon="@drawable/profile_icon">
     </item>

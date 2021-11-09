@@ -132,7 +132,7 @@ class HomeActivity : AppCompatActivity() {
 
         if(requestCode == STORAGE_PERMISSION_REQUESTCODE && grantResults.isNotEmpty()){
             if((grantResults[0] != PackageManager.PERMISSION_GRANTED)){
-                Utilities.displayToast(this@HomeActivity,"Storage Access required to upload picture")
+                Utilities.displayToast(this@HomeActivity,getString(R.string.storage_denied_permission_error))
             }
         }
     }
@@ -321,7 +321,7 @@ class HomeActivity : AppCompatActivity() {
             homeViewModel.addNoteToDB(newNote)
         }
         else{
-            Utilities.displayToast(this@HomeActivity,"Empty Note Discarded")
+            Utilities.displayToast(this@HomeActivity,getString(R.string.empty_note_discarded))
         }
     }
 

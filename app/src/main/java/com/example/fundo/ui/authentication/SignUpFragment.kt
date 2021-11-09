@@ -39,7 +39,7 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
                 authenticationSharedViewModel.setGoToHome(true)
             }
             else{
-                Utilities.displayToast(requireContext(),"Something went wrong!! User not registered")
+                Utilities.displayToast(requireContext(),getString(R.string.user_not_registered))
             }
             dialog.dismiss()
         }
@@ -65,7 +65,7 @@ class SignUpFragment:Fragment(R.layout.sign_up_fragment) {
         var confirmPassword = binding.confirmPasswordTextEdit
         val user = User(name.text.toString(),email.text.toString(),phone.text.toString())
 
-        if(Validators.signUpValidator(name,email,phone,password,confirmPassword)){
+        if(Validators.signUpValidator(requireContext(),name,email,phone,password,confirmPassword)){
             signUpViewModel.signUpWithEmailAndPassword(user,password.text.toString())
         }
         else{

@@ -7,13 +7,13 @@
     android:scrollbarThumbVertical="@null">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/signUpText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sign-Up"
+            android:text="@string/sign_up_main_text"
             android:textSize="30sp"
             android:textStyle="bold"
             android:layout_marginTop="30dp"
@@ -26,8 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/signUpText"
             android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:text="Please Fill in all the details"
+            android:text="@string/sign_up_subtext"
             android:textSize="16sp" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -40,7 +39,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/nameTextEdit"
-                android:hint="Name"
+                android:hint="@string/name_hint"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -55,7 +54,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/emailTextEdit"
-                android:hint="Email"
+                android:hint="@string/email_hint"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textEmailAddress" />
@@ -71,7 +70,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/phoneTextEdit"
-                android:hint="Phone"
+                android:hint="@string/phone_hint"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="number" />
@@ -87,7 +86,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/passwordTextEdit"
-                android:hint="Password"
+                android:hint="@string/password_hint"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textPassword" />
@@ -103,7 +102,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/confirmPasswordTextEdit"
-                android:hint="Confirm Password"
+                android:hint="@string/confirm_password_hint"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textPassword" />
@@ -116,7 +115,7 @@
             android:layout_below="@id/confirmPasswordTextEditLayout"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"
-            android:text="Register"
+            android:text="@string/register_button_text"
             android:textColor="@color/material_text_color"
             android:textSize="25sp" />
 
@@ -127,7 +126,7 @@
             android:layout_below="@id/signUpButton"
             android:layout_alignStart="@id/confirmPasswordTextEditLayout"
             android:layout_marginTop="10dp"
-            android:text="Already have an account?"
+            android:text="@string/login_pretext"
             android:textSize="14sp" />
 
         <TextView
@@ -136,8 +135,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/signUpButton"
             android:layout_marginTop="10dp"
-            android:layout_toRightOf="@id/regLogChangeLText"
-            android:text="Login"
+            android:layout_toEndOf="@id/regLogChangeLText"
+            android:text="@string/login_button_text"
             android:textColor="@color/purple_700"
             android:textSize="14sp" />
 
