@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="300dp"
+    android:id="@+id/userProfileLayout"
+    android:padding="20dp">
+
+    <ImageView
+        android:id="@+id/closeOverlayButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/button_close"/>
+
+    <ImageButton
+        android:id="@+id/userAvatarButton"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/icon_user_large"
+        android:scaleType="fitCenter"/>
+
+    <TextView
+        android:id="@+id/userNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@id/userAvatarButton"
+        android:layout_centerHorizontal="true"
+        android:text="@string/nav_drawer_username"
+        android:textStyle="bold"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/userEmailText"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:text="@string/placeholder_email"
+        android:textSize="20sp"
+        android:layout_below="@id/userNameText"
+        android:layout_centerHorizontal="true"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/userLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/userEmailText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="@string/logout_button_text"
+        android:textColor="@color/material_text_color"/>
+</RelativeLayout>

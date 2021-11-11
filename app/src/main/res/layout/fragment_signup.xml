@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:scrollbarThumbHorizontal="@null"
+    android:scrollbarThumbVertical="@null">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/signUpText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sign_up_main_text"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/smallSignUpText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signUpText"
+            android:layout_marginStart="10dp"
+            android:text="@string/sign_up_subtext"
+            android:textSize="16sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/nameTextEditLayout"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/smallSignUpText"
+            android:layout_marginTop="30dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/nameTextEdit"
+                android:hint="@string/name_hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/emailTextEditLayout"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/nameTextEditLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/emailTextEdit"
+                android:hint="@string/email_hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/phoneTextEditLayout"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/emailTextEditLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/phoneTextEdit"
+                android:hint="@string/phone_hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordTextEditLayout"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/phoneTextEditLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordTextEdit"
+                android:hint="@string/password_hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/confirmPasswordTextEditLayout"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/passwordTextEditLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/confirmPasswordTextEdit"
+                android:hint="@string/confirm_password_hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/signUpButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/confirmPasswordTextEditLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:text="@string/register_button_text"
+            android:textColor="@color/material_text_color"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/regLogChangeLText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/signUpButton"
+            android:layout_alignStart="@id/confirmPasswordTextEditLayout"
+            android:layout_marginTop="10dp"
+            android:text="@string/login_pretext"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/regLogChangeRText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/signUpButton"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@id/regLogChangeLText"
+            android:text="@string/login_button_text"
+            android:textColor="@color/purple_700"
+            android:textSize="14sp" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="invisible"/>
+    </RelativeLayout>
+</ScrollView>

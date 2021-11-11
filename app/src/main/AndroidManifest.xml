@@ -3,6 +3,7 @@
     package="com.example.fundo">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -27,10 +28,16 @@
         </activity>
         <activity
             android:name=".ui.authentication.AuthenticationActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:theme="@style/Theme.Fundo.CustomToolBar"/>
         <activity
             android:name=".ui.home.HomeActivity"
-            android:exported="true" >
+            android:exported="true"
+            android:theme="@style/Theme.Fundo.CustomToolBar">
+        </activity>
+        <activity android:name=".ui.note.NoteActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Fundo.CustomToolBar">
         </activity>
 
         <activity

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/actionSearch"
+        android:title="@string/action_search_title"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:icon="@drawable/button_action_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        >
+    </item>
+    <item
+        android:id="@+id/layoutChangeButton"
+        android:title="@string/change_layout_title"
+        app:showAsAction="always"
+        android:icon="@drawable/button_grid_switch">
+    </item>
+    <item
+        android:id="@+id/profileMenu"
+        android:title="@string/profile_title"
+        app:showAsAction="always"
+        android:icon="@drawable/icon_user">
+    </item>
+</menu>

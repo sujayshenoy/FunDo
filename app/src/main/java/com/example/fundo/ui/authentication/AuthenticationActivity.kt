@@ -5,48 +5,56 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
-import com.example.fundo.databinding.AuthBinding
+import com.example.fundo.databinding.ActivityAuthenticationBinding
+import com.example.fundo.ui.authentication.login.LoginFragment
+import com.example.fundo.ui.authentication.resetpassword.ResetPasswordFragment
+import com.example.fundo.ui.authentication.signup.SignUpFragment
 import com.example.fundo.ui.home.HomeActivity
-import com.example.fundo.utils.Utilities
+import com.example.fundo.common.Utilities
 
 class AuthenticationActivity : AppCompatActivity() {
-    private lateinit var binding: AuthBinding
-    private lateinit var authenticationViewModel: AuthenticationViewModel
+    private lateinit var binding: ActivityAuthenticationBinding
+    private lateinit var authenticationSharedViewModel: AuthenticationSharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = AuthBinding.inflate(layoutInflater)
+        binding = ActivityAuthenticationBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        authenticationViewModel = ViewModelProvider(this@AuthenticationActivity, AuthenticationViewModelFactory())[AuthenticationViewModel::class.java]
-
-        authenticationViewModel.setGoToLoginScreenStatus(true)
-
+        authenticationSharedViewModel = ViewModelProvider(this@AuthenticationActivity)[AuthenticationSharedViewModel::class.java]
         attachObservers()
+
+        authenticationSharedViewModel.setGoToLoginScreenStatus(true)
     }
 
     private fun attachObservers() {
-        authenticationViewModel.goToLoginScreen.observe(this,{
+        authenticationSharedViewModel.goToLoginScreen.observe(this@AuthenticationActivity,{
             if(it){
-                Utilities.fragmentSwitcher(supportFragmentManager,R.id.authFragmentContainer,LoginFragment())
+                Utilities.fragmentSwitcher(supportFragmentManager,R.id.authFragmentContainer,
+                    LoginFragment()
+                )
             }
         })
 
-        authenticationViewModel.goToSignUpScreen.observe(this,{
+        authenticationSharedViewModel.goToSignUpScreen.observe(this@AuthenticationActivity,{
             if(it){
-                Utilities.fragmentSwitcher(supportFragmentManager,R.id.authFragmentContainer,SignUpFragment())
+                Utilities.fragmentSwitcher(supportFragmentManager,R.id.authFragmentContainer,
+                    SignUpFragment()
+                )
             }
         })
 
-        authenticationViewModel.goToResetPassword.observe(this,{
+        authenticationSharedViewModel.goToResetPassword.observe(this@AuthenticationActivity,{
             if(it){
-                Utilities.fragmentSwitcher(supportFragmentManager,R.id.authFragmentContainer,ResetPasswordFragment())
+                Utilities.fragmentSwitcher(supportFragmentManager,R.id.authFragmentContainer,
+                    ResetPasswordFragment()
+                )
             }
         })
 
-        authenticationViewModel.goToHome.observe(this,{
+        authenticationSharedViewModel.goToHome.observe(this@AuthenticationActivity,{
             if(it){
-                val intent = Intent(this,HomeActivity::class.java)
+                val intent = Intent(this@AuthenticationActivity,HomeActivity::class.java)
                 finish()
                 startActivity(intent)
             }
