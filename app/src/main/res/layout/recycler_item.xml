@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_black_border"
+    android:background="@drawable/border_rounded_black"
     android:padding="10dp"
     android:layout_margin="5dp">
 

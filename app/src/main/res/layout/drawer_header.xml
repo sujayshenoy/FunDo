@@ -27,5 +27,5 @@
         android:layout_above="@id/userNameText"
         android:layout_alignParentStart="true"
         android:layout_marginBottom="5dp"
-        android:src="@drawable/profile_icon_large" />
+        android:src="@drawable/icon_user_large" />
 </RelativeLayout>

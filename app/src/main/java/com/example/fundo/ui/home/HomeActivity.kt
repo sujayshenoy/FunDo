@@ -9,7 +9,6 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -25,15 +24,18 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.fundo.R
+import com.example.fundo.common.Logger
 import com.example.fundo.databinding.ActivityHomeBinding
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.ui.note.NoteActivity
-import com.example.fundo.utils.NotesRecyclerAdapter
-import com.example.fundo.utils.SharedPrefUtil
-import com.example.fundo.utils.Utilities
-import com.example.fundo.viewmodels.HomeViewModel
-import com.example.fundo.viewmodels.HomeViewModelFactory
-import com.example.fundo.wrapper.Note
+import com.example.fundo.ui.note.NotesRecyclerAdapter
+import com.example.fundo.common.SharedPrefUtil
+import com.example.fundo.common.Utilities
+import com.example.fundo.config.Constants.ADD_NEW_NOTE_REQUEST_CODE
+import com.example.fundo.config.Constants.PICK_IMAGE_FOR_USERPROFILE_REQUEST_CODE
+import com.example.fundo.config.Constants.STORAGE_PERMISSION_REQUEST_CODE
+import com.example.fundo.config.Constants.UPDATE_NOTE_REQUEST_CODE
+import com.example.fundo.data.wrappers.Note
 import com.google.android.material.button.MaterialButton
 
 class HomeActivity : AppCompatActivity() {
@@ -44,16 +46,16 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var dialog:Dialog
     private lateinit var profileOverlayView: View
     private var menu: Menu? = null
-    private lateinit var notesAdapter:NotesRecyclerAdapter
+    private lateinit var notesAdapter: NotesRecyclerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        dialog = Dialog(this)
-        dialog.setContentView(R.layout.loading_dialog)
-        homeViewModel = ViewModelProvider(this,HomeViewModelFactory())[HomeViewModel::class.java]
+        dialog = Dialog(this@HomeActivity)
+        dialog.setContentView(R.layout.dialog_loading)
+        homeViewModel = ViewModelProvider(this@HomeActivity)[HomeViewModel::class.java]
 
         homeViewModel.getNotesFromDB()
         createProfileOverlay()
@@ -65,7 +67,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         this.menu = menu
-        menuInflater.inflate(R.menu.toolbar_menu,menu)
+        menuInflater.inflate(R.menu.menu_toolbar,menu)
         val item = menu?.findItem(R.id.actionSearch)
         val searchView = item?.actionView as SearchView
         
@@ -105,15 +107,15 @@ class HomeActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE && data != null){
+        if(requestCode == PICK_IMAGE_FOR_USERPROFILE_REQUEST_CODE && data != null){
             handleUserImagePickData(data.data)
         }
 
-        if(requestCode == ADD_NEW_NOTE_REQUESTCODE && data != null){
+        if(requestCode == ADD_NEW_NOTE_REQUEST_CODE && data != null){
             handleNewNoteData(data.extras)
         }
 
-        if(requestCode == UPDATE_NOTE_REQUESTCODE && data != null){
+        if(requestCode == UPDATE_NOTE_REQUEST_CODE && data != null){
             if(resultCode == NoteActivity.DELETE_NOTE){
                 handleDeleteNote(data.extras)
             }
@@ -130,9 +132,12 @@ class HomeActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode == STORAGE_PERMISSION_REQUESTCODE && grantResults.isNotEmpty()){
+        if(requestCode == STORAGE_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty()){
             if((grantResults[0] != PackageManager.PERMISSION_GRANTED)){
                 Utilities.displayToast(this@HomeActivity,getString(R.string.storage_denied_permission_error))
+            }
+            else{
+                Logger.logStorageInfo("Storage Permission: Permission granted")
             }
         }
     }
@@ -149,7 +154,7 @@ class HomeActivity : AppCompatActivity() {
                 intent.putExtra("id",note.id)
                 intent.putExtra("title", note.title)
                 intent.putExtra("content",note.content)
-                startActivityForResult(intent, UPDATE_NOTE_REQUESTCODE)
+                startActivityForResult(intent, UPDATE_NOTE_REQUEST_CODE)
             }
         })
 
@@ -159,13 +164,13 @@ class HomeActivity : AppCompatActivity() {
     private fun attachListeners() {
         binding.addNewNoteFab.setOnClickListener{
             val intent = Intent(this@HomeActivity,NoteActivity::class.java)
-            startActivityForResult(intent, ADD_NEW_NOTE_REQUESTCODE)
+            startActivityForResult(intent, ADD_NEW_NOTE_REQUEST_CODE)
         }
     }
 
     private fun createNavigationDrawer() {
         setSupportActionBar(binding.toolBar)
-        toggle = ActionBarDrawerToggle(this,binding.drawerLayout,binding.toolBar,R.string.open,R.string.close)
+        toggle = ActionBarDrawerToggle(this@HomeActivity,binding.drawerLayout,binding.toolBar,R.string.open,R.string.close)
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.isDrawerIndicatorEnabled = true
         toggle.syncState()
@@ -176,10 +181,10 @@ class HomeActivity : AppCompatActivity() {
 
         binding.navigationDrawer.setNavigationItemSelectedListener {
             when(it.itemId){
-                R.id.notes -> Utilities.displayToast(this,"Notes Selected")
-                R.id.reminders -> Utilities.displayToast(this,"Reminders Selected")
-                R.id.settings -> Utilities.displayToast(this,"Settings Selected")
-                R.id.about -> Utilities.displayToast(this,"About Selected")
+                R.id.notes -> Utilities.displayToast(this@HomeActivity,"Notes Selected")
+                R.id.reminders -> Utilities.displayToast(this@HomeActivity,"Reminders Selected")
+                R.id.settings -> Utilities.displayToast(this@HomeActivity,"Settings Selected")
+                R.id.about -> Utilities.displayToast(this@HomeActivity,"About Selected")
                 R.id.logout -> homeViewModel.logout()
             }
             binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -197,18 +202,18 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun attachObservers() {
-        homeViewModel.goToAuthenticationActivity.observe(this){
+        homeViewModel.goToAuthenticationActivity.observe(this@HomeActivity){
             var intent = Intent(this@HomeActivity,AuthenticationActivity::class.java)
             dismissProfile()
             finish()
             startActivity(intent)
         }
 
-        homeViewModel.logoutStatus.observe(this){
+        homeViewModel.logoutStatus.observe(this@HomeActivity){
             homeViewModel.setGoToAuthenticationActivity(true)
         }
 
-        homeViewModel.setUserAvatarStatus.observe(this){
+        homeViewModel.setUserAvatarStatus.observe(this@HomeActivity){
             val userProfileIcon:ImageButton = profileOverlayView.findViewById(R.id.userAvatarButton)
             userProfileIcon.setImageBitmap(it)
 
@@ -222,7 +227,7 @@ class HomeActivity : AppCompatActivity() {
             dialog.dismiss()
         }
 
-        homeViewModel.getNotesFromDB.observe(this){
+        homeViewModel.getNotesFromDB.observe(this@HomeActivity){
             noteList.clear()
             noteList.addAll(it)
             syncLists()
@@ -233,7 +238,6 @@ class HomeActivity : AppCompatActivity() {
             noteList.add(it)
             syncLists()
             notesAdapter.notifyDataSetChanged()
-            Log.d("RES","id = ${it.id}")
         }
 
         homeViewModel.updateNoteInDB.observe(this@HomeActivity){
@@ -256,19 +260,19 @@ class HomeActivity : AppCompatActivity() {
 
     private fun changeLayout(item:MenuItem) {
         if(layoutFlag){
-            item.setIcon(R.drawable.linear_layout_icon)
+            item.setIcon(R.drawable.button_linear_switch)
             binding.notesRecyclerView.layoutManager = LinearLayoutManager(this@HomeActivity)
         }
         else{
-            item.setIcon(R.drawable.grid_layout_icon)
+            item.setIcon(R.drawable.button_grid_switch)
             binding.notesRecyclerView.layoutManager = StaggeredGridLayoutManager(2,1)
         }
         layoutFlag = !layoutFlag
     }
 
     private fun createProfileOverlay() {
-        profileOverlayView = LayoutInflater.from(this@HomeActivity).inflate(R.layout.user_profile,null)
-        alertDialog = AlertDialog.Builder(this)
+        profileOverlayView = LayoutInflater.from(this@HomeActivity).inflate(R.layout.dialog_userprofile,null)
+        alertDialog = AlertDialog.Builder(this@HomeActivity)
             .setView(profileOverlayView)
             .create()
 
@@ -295,16 +299,16 @@ class HomeActivity : AppCompatActivity() {
                 pickImageFromGallery()
             }
             else{
-                Log.d("Permission","Permission not granted")
+                Logger.logStorageError("Storage Permission: Permission not granted")
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    STORAGE_PERMISSION_REQUESTCODE)
+                    STORAGE_PERMISSION_REQUEST_CODE)
             }
         }
     }
 
     private fun pickImageFromGallery(){
         val intent = Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE)
+        startActivityForResult(intent, PICK_IMAGE_FOR_USERPROFILE_REQUEST_CODE)
     }
 
     private fun handleUserImagePickData(imageUri: Uri?) {
@@ -352,10 +356,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
     companion object{
-        private val STORAGE_PERMISSION_REQUESTCODE = 0
-        private val PICK_IMAGE_FOR_USERPROFILE_REQUESTCODE = 1
-        private val ADD_NEW_NOTE_REQUESTCODE = 2
-        private val UPDATE_NOTE_REQUESTCODE = 3
         private val noteList = mutableListOf<Note>()
         private val tempList = mutableListOf<Note>()
         private var layoutFlag = true

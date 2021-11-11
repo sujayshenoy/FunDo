@@ -22,14 +22,14 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginRight="20dp"
-                android:background="@drawable/toolbar_border"
+                android:background="@drawable/border_toolbar"
                 app:elevation="0dp">
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:navigationIcon="@drawable/drawer_menu"
+                    app:navigationIcon="@drawable/button_drawer_toggle"
                     app:title="@string/app_name" />
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -52,14 +52,14 @@
             android:layout_marginEnd="30dp"
             android:layout_marginBottom="30dp"
             android:elevation="10dp"
-            android:src="@drawable/fab_plus" />
+            android:src="@drawable/button_fab_add" />
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationDrawer"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        app:menu="@menu/drawer_menu"
+        app:menu="@menu/menu_drawer"
         app:headerLayout="@layout/drawer_header"
         android:layout_gravity="start" />
 
