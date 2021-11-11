@@ -3,10 +3,13 @@ package com.example.fundo.ui.authentication.login
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.auth.services.FirebaseAuthService
 import com.example.fundo.data.services.DatabaseService
 import com.facebook.AccessToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LoginViewModel:ViewModel() {
     private val _emailPassLoginStatus = MutableLiveData<User>()
@@ -17,23 +20,22 @@ class LoginViewModel:ViewModel() {
 
     fun loginWithEmailAndPassword(email:String,password:String) {
         FirebaseAuthService.signInWithEmailAndPassword(email,password){ user ->
-            if(user?.loginStatus == true){
-                DatabaseService.getUserFromDB {
-                    _emailPassLoginStatus.value = user
+            viewModelScope.launch(Dispatchers.IO){
+                if(user?.loginStatus == true) {
+                    DatabaseService.getUserFromDB()
                 }
-            }
-            else{
-                _emailPassLoginStatus.value = user
+                _emailPassLoginStatus.postValue(user)
             }
         }
     }
 
     fun loginWithFacebook(accessToken: AccessToken) {
         FirebaseAuthService.handleFacebookLogin(accessToken){ user ->
-            if (user != null) {
-                DatabaseService.addUserToDB(user){
-                    _facebookLoginStatus.value = user
+            viewModelScope.launch(Dispatchers.IO) {
+                if (user != null) {
+                    DatabaseService.addUserToDB(user)
                 }
+                _facebookLoginStatus.postValue(user)
             }
         }
     }

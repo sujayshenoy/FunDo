@@ -9,6 +9,10 @@ import com.example.fundo.data.services.DatabaseService
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.ui.home.HomeActivity
 import com.example.fundo.common.SharedPrefUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class SplashScreenActivity: AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
@@ -29,13 +33,13 @@ class SplashScreenActivity: AppCompatActivity() {
                 startActivity(intent)
             }
             else{
-                DatabaseService.getUserFromDB {
+                CoroutineScope(Dispatchers.IO).launch(Dispatchers.IO) {
+                    DatabaseService.getUserFromDB()
                     val intent = Intent(this@SplashScreenActivity, HomeActivity::class.java)
                     finish()
                     startActivity(intent)
                 }
             }
-
         }
     }
 }

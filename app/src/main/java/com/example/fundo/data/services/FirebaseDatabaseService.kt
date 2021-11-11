@@ -10,114 +10,125 @@ import com.example.fundo.common.Logger
 import com.example.fundo.interfaces.DatabaseInterface
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.suspendCoroutine
 
 object FirebaseDatabaseService : DatabaseInterface {
     private val database = Firebase.database.reference
-
-    override fun addUserToDB(user : User, callback : (Boolean) -> Unit){
+    override suspend fun addUserToDB(user : User) : Boolean{
         val userDB = DBUser(user.name,user.email,user.phone)
-        database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
-            .setValue(userDB).addOnCompleteListener {
-            if(it.isSuccessful){
-                Utilities.addUserToSharedPref(userDB)
-                callback(true)
-            }
-            else{
-                Logger.logDbError("Write Failed")
-                Logger.logDbError(it.exception.toString())
-                callback(false)
-            }
-        }
-    }
-
-    override fun getUserFromDB(callback: (Boolean) -> Unit) {
-        database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
-            .get().addOnCompleteListener { status ->
-                if(status.isSuccessful) {
-                    status.result.also {
-                        Logger.logDbInfo("User from DB $it")
-                        val user = Utilities.createUserFromHashMap(it?.value as HashMap<*, *>)
-                        Utilities.addUserToSharedPref(user)
-                        callback(true)
+        return suspendCoroutine {
+            database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
+                .setValue(userDB).addOnCompleteListener { task ->
+                    if(task.isSuccessful){
+                        Utilities.addUserToSharedPref(userDB)
+                        Logger.logDbInfo("User added to DB")
+                        it.resumeWith(Result.success(true))
+                    }
+                    else{
+                        Logger.logDbError("RealTimeDB: Add user to db failed")
+                        it.resumeWith(Result.failure(task.exception!!))
                     }
                 }
-                else{
-                    Logger.logDbError("Read Failed")
-                    Logger.logDbError(status.exception.toString())
-                    callback(false)
+        }
+
+    }
+
+    override suspend fun getUserFromDB() : Boolean {
+        return suspendCoroutine {
+            database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
+                .get().addOnCompleteListener { task ->
+                    if(task.isSuccessful) {
+                        task.result.also { snapshot ->
+                            Logger.logDbInfo("User from DB $snapshot")
+                            val user = Utilities.createUserFromHashMap(snapshot?.value as HashMap<*, *>)
+                            Utilities.addUserToSharedPref(user)
+                            it.resumeWith(Result.success(true))
+                        }
+                    }
+                    else{
+                        Logger.logDbError("RealtimeDB:Read Failed")
+                        it.resumeWith(Result.failure(task.exception!!))
+                    }
                 }
         }
     }
 
-    override fun addNoteToDB(note: Note, callback: (Note?) -> Unit) {
+    override suspend fun addNoteToDB(note: Note) : Note? {
         val dbNote = DBNote(note.title,note.content)
-        val ref = database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
-            .child("notes").push()
-        ref.setValue(dbNote)
-            .addOnCompleteListener {
-                if(it.isSuccessful){
-                    note.id = ref.key.toString()
-                    callback(note)
-                }
-                else{
-                    Logger.logDbError("Write Failed")
-                    Logger.logDbError(it.exception.toString())
-                    callback(null)
-                }
-            }
-    }
-
-    override fun getNotesFromDB(callback: (List<Note>?) -> Unit) {
-        val notes = mutableListOf<Note>()
-        database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
-            .child("notes").get().addOnCompleteListener {
-                if(it.isSuccessful){
-                    for(i in it.result?.children!!){
-                        val noteHashMap = i.value as HashMap<String,String>
-                        val note = Note(noteHashMap["title"].toString(),noteHashMap["content"].toString(),
-                            i.key.toString())
-                        notes.add(note)
+        return suspendCoroutine {
+            val ref = database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
+                .child("notes").push()
+            ref.setValue(dbNote)
+                .addOnCompleteListener { task->
+                    if(task.isSuccessful){
+                        note.id = ref.key.toString()
+                        it.resumeWith(Result.success(note))
                     }
-                    callback(notes)
+                    else{
+                        Logger.logDbError("RealTimeDB: Write Failed")
+                        it.resumeWith(Result.failure(task.exception!!))
+                    }
                 }
-                else{
-                    Logger.logDbError("Read Failed")
-                    Logger.logDbError(it.exception.toString())
-                    callback(null)
-                }
-            }
+        }
     }
 
-    override fun updateNoteInDB(note: Note, callback: (Note?) -> Unit){
+    override suspend fun getNotesFromDB() : List<Note> {
+        val notes = mutableListOf<Note>()
+        return suspendCoroutine {
+            database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
+                .child("notes").get().addOnCompleteListener { task ->
+                    if(task.isSuccessful){
+                        for(i in task.result?.children!!){
+                            val noteHashMap = i.value as HashMap<String,String>
+                            val note = Note(noteHashMap["title"].toString(),noteHashMap["content"].toString(),
+                                i.key.toString())
+                            notes.add(note)
+                        }
+                        it.resumeWith(Result.success(notes))
+                    }
+                    else{
+                        Logger.logDbError("RealTimeDB: Read Failed")
+                        it.resumeWith(Result.failure(task.exception!!))
+                    }
+                }
+        }
+    }
+
+    override suspend fun updateNoteInDB(note: Note) : Note{
         val noteMap = mapOf(
             "title" to note.title,
             "content" to note.content
         )
 
-        database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
-            .child("notes").child(note.id).updateChildren(noteMap)
-            .addOnCompleteListener {
-                if(it.isSuccessful){
-                    callback(note)
+        return suspendCoroutine {
+            database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
+                .child("notes").child(note.id).updateChildren(noteMap)
+                .addOnCompleteListener { task ->
+                    if(task.isSuccessful){
+                        it.resumeWith(Result.success(note))
+                    }
+                    else{
+                        Logger.logDbError("RealTimeDB : Read Failed")
+                        it.resumeWith(Result.failure(task.exception!!))
+                    }
                 }
-                else{
-                    Logger.logDbError("Read Failed")
-                    Logger.logDbError(it.exception.toString())
-                    callback(null)
-                }
-            }
+        }
     }
 
-    override fun deleteNoteFromDB(note: Note, callback: (Note?) -> Unit){
-        database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
-            .child("notes").child(note.id).removeValue()
-            .addOnCompleteListener {
-                if(it.isSuccessful){
-                    callback(note)
+    override suspend fun deleteNoteFromDB(note: Note):Note{
+        return suspendCoroutine {
+            database.child("users").child(FirebaseAuthService.getCurrentUser()?.uid.toString())
+                .child("notes").child(note.id).removeValue()
+                .addOnCompleteListener { task ->
+                    if(task.isSuccessful){
+                        it.resumeWith(Result.success(note))
+                    }
+                    else{
+                        Logger.logDbError("RealTimeDB : Read Failed")
+                        it.resumeWith(Result.failure(task.exception!!))
+                    }
                 }
-                else{
-                    callback(null)
-                }
-            }
+        }
     }
 }

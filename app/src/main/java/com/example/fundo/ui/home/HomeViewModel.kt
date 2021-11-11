@@ -4,10 +4,14 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.fundo.auth.services.FirebaseAuthService
 import com.example.fundo.data.services.DatabaseService
 import com.example.fundo.data.services.StorageService
 import com.example.fundo.data.wrappers.Note
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class HomeViewModel:ViewModel() {
     private var _logoutStatus = MutableLiveData<Boolean>()
@@ -36,42 +40,58 @@ class HomeViewModel:ViewModel() {
     }
 
     fun setUserAvatar(bitmap: Bitmap){
-        StorageService.addUserAvatar(bitmap){
-            if(it){
-                _setUserAvatarStatus.value = bitmap
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                StorageService.addUserAvatar(bitmap).also{
+                    _setUserAvatarStatus.postValue(bitmap)
+                }
+            } catch (ex:Exception){
+                ex.printStackTrace()
             }
         }
     }
 
     fun getUserAvatar(){
-        StorageService.getUserAvatar {
-            if(it!=null){
-                _setUserAvatarStatus.value = it
+        viewModelScope.launch(Dispatchers.IO) {
+            try{
+                StorageService.getUserAvatar().also {
+                    _setUserAvatarStatus.postValue(it)
+                }
+            }catch (ex: Exception){
+                ex.printStackTrace()
             }
         }
     }
 
     fun addNoteToDB(note: Note){
-        DatabaseService.addNoteToDB(note){
-            _addNoteToDB.value = it
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseService.addNoteToDB(note).also {
+                _addNoteToDB.postValue(it)
+            }
         }
     }
 
     fun updateNoteInDB(note: Note){
-        DatabaseService.updateNoteInDB(note){
-            _updateNoteInDB.value = it
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseService.updateNoteInDB(note).also {
+                _updateNoteInDB.postValue(it)
+            }
         }
     }
 
     fun deleteNoteFromDB(note: Note){
-        DatabaseService.deleteNoteFromDB(note){
-            _deleteNoteFromDB.value = note
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseService.deleteNoteFromDB(note).also {
+                _deleteNoteFromDB.postValue(it)
+            }
         }
     }
 
     fun getNotesFromDB(){
-        DatabaseService.getNotesFromDB {
-            _getNotesFromDB.value = it
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseService.getNotesFromDB().also {
+                _getNotesFromDB.postValue(it)
+            }
         }
     }
 

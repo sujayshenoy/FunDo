@@ -4,15 +4,15 @@ import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
 
 interface DatabaseInterface {
-    fun addUserToDB(user : User, callback : (Boolean) -> Unit)
+    suspend fun addUserToDB(user : User):Boolean
 
-    fun getUserFromDB(callback: (Boolean) -> Unit)
+    suspend fun getUserFromDB():Boolean
 
-    fun addNoteToDB(note: Note, callback: (Note?) -> Unit)
+    suspend fun addNoteToDB(note: Note) : Note?
 
-    fun getNotesFromDB(callback: (List<Note>?) -> Unit)
+    suspend fun getNotesFromDB() : List<Note>?
 
-    fun updateNoteInDB(note: Note, callback: (Note?) -> Unit)
+    suspend fun updateNoteInDB(note: Note) : Note?
 
-    fun deleteNoteFromDB(note: Note, callback: (Note?) -> Unit)
+    suspend fun deleteNoteFromDB(note: Note):Note?
 }

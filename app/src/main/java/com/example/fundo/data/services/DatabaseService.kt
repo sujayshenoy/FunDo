@@ -3,29 +3,74 @@ package com.example.fundo.data.services
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.interfaces.DatabaseInterface
+import com.google.firebase.FirebaseException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object DatabaseService : DatabaseInterface {
-    override fun addUserToDB(user : User, callback : (Boolean) -> Unit){
-        FirebaseDatabaseService.addUserToDB(user, callback)
+    override suspend fun addUserToDB(user : User) : Boolean{
+        return try{
+            return withContext(Dispatchers.IO){
+                return@withContext FirebaseDatabaseService.addUserToDB(user)
+            }
+        } catch (ex:FirebaseException){
+            ex.printStackTrace()
+            false
+        }
     }
 
-    override fun getUserFromDB(callback: (Boolean) -> Unit) {
-        FirebaseDatabaseService.getUserFromDB(callback)
+    override suspend fun getUserFromDB() : Boolean {
+        return try {
+            return withContext(Dispatchers.IO){
+                return@withContext FirebaseDatabaseService.getUserFromDB()
+            }
+        } catch (ex:FirebaseException){
+            ex.printStackTrace()
+            false
+        }
     }
 
-    override fun addNoteToDB(note: Note, callback: (Note?) -> Unit) {
-        FirebaseDatabaseService.addNoteToDB(note, callback)
+    override suspend fun addNoteToDB(note: Note):Note? {
+        return try {
+            return withContext(Dispatchers.IO){
+                return@withContext FirebaseDatabaseService.addNoteToDB(note)
+            }
+        } catch (ex:FirebaseException){
+            ex.printStackTrace()
+            null
+        }
     }
 
-    override fun getNotesFromDB(callback: (List<Note>?) -> Unit) {
-        FirebaseDatabaseService.getNotesFromDB(callback)
+    override suspend fun getNotesFromDB():List<Note>? {
+        return try {
+            return withContext(Dispatchers.IO){
+                return@withContext FirebaseDatabaseService.getNotesFromDB()
+            }
+        } catch (ex:FirebaseException){
+            ex.printStackTrace()
+            null
+        }
     }
 
-    override fun updateNoteInDB(note: Note, callback: (Note?) -> Unit){
-        FirebaseDatabaseService.updateNoteInDB(note, callback)
+    override suspend fun updateNoteInDB(note: Note):Note?{
+        return try {
+            return withContext(Dispatchers.IO){
+                return@withContext FirebaseDatabaseService.updateNoteInDB(note)
+            }
+        } catch (ex:FirebaseException){
+            ex.printStackTrace()
+            null
+        }
     }
 
-    override fun deleteNoteFromDB(note: Note, callback: (Note?) -> Unit){
-        FirebaseDatabaseService.deleteNoteFromDB(note, callback)
+    override suspend fun deleteNoteFromDB(note: Note):Note?{
+        return try {
+            return withContext(Dispatchers.IO){
+                return@withContext FirebaseDatabaseService.deleteNoteFromDB(note)
+            }
+        } catch (ex:FirebaseException){
+            ex.printStackTrace()
+            null
+        }
     }
 }
