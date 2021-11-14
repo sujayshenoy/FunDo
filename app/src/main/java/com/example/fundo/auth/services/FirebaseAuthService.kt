@@ -1,8 +1,10 @@
 package com.example.fundo.auth.services
 
+import android.content.Context
 import com.example.fundo.common.Logger
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.common.SharedPrefUtil
+import com.example.fundo.data.room.FunDoDatabase
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import com.google.firebase.auth.*
@@ -14,16 +16,19 @@ object FirebaseAuthService {
 
     fun getCurrentUser() = auth.currentUser
 
-    fun signUpWithEmailAndPassword(email: String, password:String, callback: (Boolean) -> Unit) {
+    fun signUpWithEmailAndPassword(email: String, password:String, callback: (User?) -> Unit) {
         auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener {
             if(it.isSuccessful){
                 Logger.logAuthInfo("Sign Up Successful")
-                callback(true)
+                val curUser = getCurrentUser()
+                val user = User(curUser?.displayName.toString(),curUser?.email.toString(),
+                    curUser?.phoneNumber.toString(),firebaseId = getCurrentUser()?.uid.toString())
+                callback(user)
             }
             else{
                 Logger.logAuthError("Something Went Wrong!! Please Try Again")
                 Logger.logAuthError(it.exception.toString())
-                callback(false)
+                callback(null)
             }
         }
     }
@@ -33,7 +38,7 @@ object FirebaseAuthService {
             Logger.logAuthInfo("User already logged in")
             val curUser = getCurrentUser()
             val user = User(curUser?.displayName.toString(),curUser?.email.toString(),
-                curUser?.phoneNumber.toString(),true)
+                curUser?.phoneNumber.toString(),firebaseId = getCurrentUser()?.uid.toString())
             callback(user)
             return
         }
@@ -44,13 +49,12 @@ object FirebaseAuthService {
                 Logger.logAuthInfo("Authentication Successful ${getCurrentUser()}")
                 val curUser = getCurrentUser()
                 user = User(curUser?.displayName.toString(),curUser?.email.toString(),
-                    curUser?.phoneNumber.toString(),true)
+                    curUser?.phoneNumber.toString(),firebaseId = getCurrentUser()?.uid.toString())
                 callback(user)
             }
             else{
                 Logger.logAuthError("Authentication Failed ${it.exception}")
-                user = User("","","",false)
-                callback(user)
+                callback(null)
             }
         }
     }
@@ -59,27 +63,25 @@ object FirebaseAuthService {
         var credential = FacebookAuthProvider.getCredential(accessToken.token)
         auth.signInWithCredential(credential)
             .addOnCompleteListener {
-                var user: User?
                 if(it.isSuccessful){
                     Logger.logAuthInfo("facebook;signInWithCredential;success")
                     var curUser = getCurrentUser()
                     var email = curUser?.email.toString()
                     var name = curUser?.displayName.toString()
                     var phone = curUser?.phoneNumber.toString()
-
-                    var user = User(name,email,phone)
+                    var user = User(name,email,phone,firebaseId = curUser?.uid.toString())
                     callback(user)
                 }
                 else{
                     Logger.logAuthError("Authentication Failed ${it.exception}")
-                    user = User("","","",false)
-                    callback(user)
+                    callback(null)
                 }
             }
     }
 
-    fun signOut(callback: (Boolean) -> Unit) {
+    fun signOut(context:Context,callback: (Boolean) -> Unit) {
         SharedPrefUtil.clearAll()
+        FunDoDatabase.getDatabase(context).clearAll()
         auth.signOut()
         LoginManager.getInstance().logOut()
         callback(true)

@@ -8,10 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.common.Logger
+import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.databinding.FragmentLoginBinding
 import com.example.fundo.ui.authentication.AuthenticationSharedViewModel
 import com.example.fundo.common.Utilities
 import com.example.fundo.common.Validators
+import com.example.fundo.data.services.DatabaseService
+import com.example.fundo.data.wrappers.User
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -40,12 +43,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     }
 
     private fun attachObservers() {
-        loginViewModel.emailPassLoginStatus.observe(viewLifecycleOwner){ user ->
-            handleLogin(user.loginStatus)
+        loginViewModel.emailPassLoginStatus.observe(viewLifecycleOwner){
+            handleLogin(it)
         }
 
-        loginViewModel.facebookLoginStatus.observe(viewLifecycleOwner){ user ->
-            handleLogin(user.loginStatus)
+        loginViewModel.facebookLoginStatus.observe(viewLifecycleOwner){
+            handleLogin(it)
         }
     }
 
@@ -102,13 +105,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
-    private fun handleLogin(status:Boolean){
+    private fun handleLogin(status: Boolean){
         if(status) {
             Utilities.displayToast(requireContext(),getString(R.string.sign_in_success_toast))
             authenticationSharedViewModel.setGoToHome(true)
         }
         else {
-            Logger.logAuthError("Authentication Failed")
             Utilities.displayToast(requireContext(),getString(R.string.sign_in_failed_toast))
         }
         dialog.dismiss()

@@ -1,14 +1,17 @@
 package com.example.fundo.ui.home
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fundo.auth.services.FirebaseAuthService
+import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.data.services.DatabaseService
 import com.example.fundo.data.services.StorageService
 import com.example.fundo.data.wrappers.Note
+import com.example.fundo.data.wrappers.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -34,6 +37,9 @@ class HomeViewModel:ViewModel() {
 
     private val _deleteNoteFromDB = MutableLiveData<Note>()
     val deleteNoteFromDB = _deleteNoteFromDB as LiveData<Note>
+
+    private val _getUserFromDB = MutableLiveData<User>()
+    val getUserFromDB = _getUserFromDB as LiveData<User>
 
     fun setGoToAuthenticationActivity(status:Boolean) {
         _goToAuthenticationActivity.value = status
@@ -63,41 +69,53 @@ class HomeViewModel:ViewModel() {
         }
     }
 
-    fun addNoteToDB(note: Note){
+    fun addNoteToDB(note: Note,user: User){
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.addNoteToDB(note).also {
+            DatabaseService.addNoteToDB(note,user).also {
                 _addNoteToDB.postValue(it)
             }
         }
     }
 
-    fun updateNoteInDB(note: Note){
+    fun updateNoteInDB(note: Note,user: User){
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.updateNoteInDB(note).also {
+            DatabaseService.updateNoteInDB(note,user).also {
                 _updateNoteInDB.postValue(it)
             }
         }
     }
 
-    fun deleteNoteFromDB(note: Note){
+    fun deleteNoteFromDB(note: Note,user: User){
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.deleteNoteFromDB(note).also {
+            DatabaseService.deleteNoteFromDB(note,user).also {
                 _deleteNoteFromDB.postValue(it)
             }
         }
     }
 
-    fun getNotesFromDB(){
+    fun getNotesFromDB(user: User){
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.getNotesFromDB().also {
+            DatabaseService.getNotesFromDB(user).let {
                 _getNotesFromDB.postValue(it)
             }
         }
     }
 
-    fun logout() {
-        FirebaseAuthService.signOut(){
-            _logoutStatus.value = it
+    fun logout(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            FirebaseAuthService.signOut(context){
+                _logoutStatus.postValue(it)
+            }
+        }
+    }
+
+    fun getUserFromDB() {
+        viewModelScope.launch{
+            val userId = SharedPrefUtil.getUserId()
+            if(userId > 0){
+                val user = DatabaseService.getUserFromDB(userId)
+                _getUserFromDB.postValue(user)
+            }
         }
     }
 }

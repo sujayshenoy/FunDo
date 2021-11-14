@@ -23,10 +23,4 @@ object Utilities {
         return DBUser(userMap["name"].toString(),userMap["email"].toString(),
             userMap["phone"].toString())
     }
-
-    fun addUserToSharedPref(userDB: DBUser) {
-        SharedPrefUtil.addString("userEmail",userDB.email)
-        SharedPrefUtil.addString("userName",userDB.name)
-        SharedPrefUtil.addString("userPhone",userDB.phone)
-    }
 }

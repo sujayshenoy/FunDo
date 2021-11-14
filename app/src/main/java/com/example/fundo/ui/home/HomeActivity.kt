@@ -29,14 +29,15 @@ import com.example.fundo.databinding.ActivityHomeBinding
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.ui.note.NoteActivity
 import com.example.fundo.ui.note.NotesRecyclerAdapter
-import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.common.Utilities
 import com.example.fundo.config.Constants.ADD_NEW_NOTE_REQUEST_CODE
 import com.example.fundo.config.Constants.PICK_IMAGE_FOR_USERPROFILE_REQUEST_CODE
 import com.example.fundo.config.Constants.STORAGE_PERMISSION_REQUEST_CODE
 import com.example.fundo.config.Constants.UPDATE_NOTE_REQUEST_CODE
 import com.example.fundo.data.wrappers.Note
+import com.example.fundo.data.wrappers.User
 import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.*
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding:ActivityHomeBinding
@@ -47,6 +48,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var profileOverlayView: View
     private var menu: Menu? = null
     private lateinit var notesAdapter: NotesRecyclerAdapter
+    private var currentUser : User = User(name = "Name",email = "email",phone = "phone")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,12 +59,14 @@ class HomeActivity : AppCompatActivity() {
         dialog.setContentView(R.layout.dialog_loading)
         homeViewModel = ViewModelProvider(this@HomeActivity)[HomeViewModel::class.java]
 
-        homeViewModel.getNotesFromDB()
+        homeViewModel.getUserFromDB()
+        homeViewModel.getNotesFromDB(currentUser)
         createProfileOverlay()
         createNavigationDrawer()
         attachObservers()
         attachListeners()
         initNotesRecyclerView()
+        setUserData()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -175,17 +179,13 @@ class HomeActivity : AppCompatActivity() {
         toggle.isDrawerIndicatorEnabled = true
         toggle.syncState()
 
-        val headerView = binding.navigationDrawer.getHeaderView(0)
-        val userNameTextView: TextView = headerView.findViewById(R.id.userNameText)
-        userNameTextView.text = SharedPrefUtil.getUserName()
-
         binding.navigationDrawer.setNavigationItemSelectedListener {
             when(it.itemId){
                 R.id.notes -> Utilities.displayToast(this@HomeActivity,"Notes Selected")
                 R.id.reminders -> Utilities.displayToast(this@HomeActivity,"Reminders Selected")
                 R.id.settings -> Utilities.displayToast(this@HomeActivity,"Settings Selected")
                 R.id.about -> Utilities.displayToast(this@HomeActivity,"About Selected")
-                R.id.logout -> homeViewModel.logout()
+                R.id.logout -> homeViewModel.logout(this@HomeActivity)
             }
             binding.drawerLayout.closeDrawer(GravityCompat.START)
 
@@ -207,6 +207,11 @@ class HomeActivity : AppCompatActivity() {
             dismissProfile()
             finish()
             startActivity(intent)
+        }
+
+        homeViewModel.getUserFromDB.observe(this@HomeActivity){
+            currentUser = it
+            setUserData()
         }
 
         homeViewModel.logoutStatus.observe(this@HomeActivity){
@@ -279,19 +284,13 @@ class HomeActivity : AppCompatActivity() {
         homeViewModel.getUserAvatar()
         val dialogLogoutButton:MaterialButton = profileOverlayView.findViewById(R.id.userLogout)
         dialogLogoutButton.setOnClickListener{
-            homeViewModel.logout()
+            homeViewModel.logout(this@HomeActivity)
         }
 
         val closeOverlayButton:ImageView = profileOverlayView.findViewById(R.id.closeOverlayButton)
         closeOverlayButton.setOnClickListener{
             dismissProfile()
         }
-
-        val userNameText:TextView = profileOverlayView.findViewById(R.id.userNameText)
-        val userEmailText:TextView = profileOverlayView.findViewById(R.id.userEmailText)
-
-        userNameText.text = SharedPrefUtil.getUserName()
-        userEmailText.text = SharedPrefUtil.getUserEmail()
 
         val userProfileIcon:ImageButton = profileOverlayView.findViewById(R.id.userAvatarButton)
         userProfileIcon.setOnClickListener{
@@ -304,6 +303,17 @@ class HomeActivity : AppCompatActivity() {
                     STORAGE_PERMISSION_REQUEST_CODE)
             }
         }
+    }
+
+    private fun setUserData(){
+        val modalUserNameText:TextView = profileOverlayView.findViewById(R.id.userNameText)
+        val modalUserEmailText:TextView = profileOverlayView.findViewById(R.id.userEmailText)
+        val headerView = binding.navigationDrawer.getHeaderView(0)
+        val navUserNameText: TextView = headerView.findViewById(R.id.userNameText)
+
+        modalUserEmailText.text = currentUser.email
+        modalUserNameText.text = currentUser.name
+        navUserNameText.text = currentUser.name
     }
 
     private fun pickImageFromGallery(){
@@ -321,8 +331,8 @@ class HomeActivity : AppCompatActivity() {
         val title = noteBundle?.getString("title").toString()
         val content = noteBundle?.getString("content").toString()
         if(title.isNotEmpty() || content.isNotEmpty()){
-            val newNote = Note(title,content,"")
-            homeViewModel.addNoteToDB(newNote)
+            val newNote = Note(title,content)
+            homeViewModel.addNoteToDB(newNote,currentUser)
         }
         else{
             Utilities.displayToast(this@HomeActivity,getString(R.string.empty_note_discarded))
@@ -330,14 +340,14 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun handleNoteUpdate(noteBundle: Bundle?) {
-        val id = noteBundle?.getString("id").toString()
+        val id = noteBundle?.getLong("id")
         val title = noteBundle?.getString("title").toString()
         val content = noteBundle?.getString("content").toString()
 
         if(title.isNotEmpty() || content.isNotEmpty()){
             val updateNote = noteList.find { it.id == id}!!
-            val note = Note(title,content,updateNote.id)
-            homeViewModel.updateNoteInDB(note)
+            val note = Note(title,content,updateNote.id,updateNote.firebaseId)
+            homeViewModel.updateNoteInDB(note,currentUser)
         }
         else{
             handleDeleteNote(noteBundle)
@@ -345,9 +355,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun handleDeleteNote(noteBundle: Bundle?) {
-        val id = noteBundle?.getString("id").toString()
+        val id = noteBundle?.getLong("id")
         val deleteNote = noteList.find { it.id == id}!!
-        homeViewModel.deleteNoteFromDB(deleteNote)
+        homeViewModel.deleteNoteFromDB(deleteNote,currentUser)
     }
 
     private fun syncLists(){

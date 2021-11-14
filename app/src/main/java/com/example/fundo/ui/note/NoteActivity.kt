@@ -8,7 +8,7 @@ import com.example.fundo.databinding.ActivityNoteBinding
 
 class NoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteBinding
-    private lateinit var id: String
+    private var id: Long? = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +22,7 @@ class NoteActivity : AppCompatActivity() {
 
     private fun loadDataFromIntent() {
         val intent = intent
-        id = intent.extras?.getString("id").toString()
+        id = intent.extras?.getLong("id")
         val title = intent.extras?.getString("title")
         val content = intent.extras?.getString("content")
 

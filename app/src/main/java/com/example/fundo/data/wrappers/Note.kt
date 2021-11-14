@@ -1,3 +1,5 @@
 package com.example.fundo.data.wrappers
 
-data class Note (var title: String, var content:String,var id:String)
+import java.util.*
+
+data class Note (var title: String, var content:String,var id:Long=0,var firebaseId:String = "",var lastModified: Date?=null)

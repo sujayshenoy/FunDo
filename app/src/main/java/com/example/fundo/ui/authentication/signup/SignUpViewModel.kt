@@ -6,9 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.auth.services.FirebaseAuthService
-import com.example.fundo.common.Logger
+import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.data.services.DatabaseService
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SignUpViewModel: ViewModel() {
@@ -16,12 +15,19 @@ class SignUpViewModel: ViewModel() {
     val emailPassSignUpStatus = _emailPassSignUpStatus as LiveData<Boolean>
 
     fun signUpWithEmailAndPassword(user: User, password: String) {
-        FirebaseAuthService.signUpWithEmailAndPassword(user.email,password) {
+        FirebaseAuthService.signUpWithEmailAndPassword(user.email,password) { userAuth ->
             viewModelScope.launch{
-                if(it){
-                    DatabaseService.addUserToDB(user)
+                if(userAuth != null){
+                    val newUser = User(user.name,user.email,user.phone,user.id,userAuth.firebaseId)
+                    DatabaseService.addUserToCloudDB(newUser)
+                    DatabaseService.addUserToDB(newUser)?.let {
+                        SharedPrefUtil.addUserId(it.id)
+                    }
+                    _emailPassSignUpStatus.value = true
                 }
-                _emailPassSignUpStatus.value = it
+                else{
+                    _emailPassSignUpStatus.value = false
+                }
             }
         }
     }
