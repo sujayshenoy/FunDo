@@ -170,6 +170,10 @@ class HomeActivity : AppCompatActivity() {
             val intent = Intent(this@HomeActivity,NoteActivity::class.java)
             startActivityForResult(intent, ADD_NEW_NOTE_REQUEST_CODE)
         }
+
+        binding.swipeRefreshView.setOnRefreshListener {
+            homeViewModel.syncDB(this@HomeActivity,currentUser)
+        }
     }
 
     private fun createNavigationDrawer() {
@@ -242,24 +246,32 @@ class HomeActivity : AppCompatActivity() {
         homeViewModel.addNoteToDB.observe(this@HomeActivity){
             noteList.add(it)
             syncLists()
-            notesAdapter.notifyDataSetChanged()
+            notesAdapter.notifyItemInserted(noteList.size)
         }
 
         homeViewModel.updateNoteInDB.observe(this@HomeActivity){
+            var pos : Int = -1
             noteList.map { note ->
                 if(note.id == it.id){
                     note.title = it.title
                     note.content = it.content
+                    pos = noteList.indexOf(note)
                 }
             }
             syncLists()
-            notesAdapter.notifyDataSetChanged()
+            notesAdapter.notifyItemChanged(pos)
         }
 
         homeViewModel.deleteNoteFromDB.observe(this@HomeActivity){
-            noteList.removeIf { note -> note.id == it.id }
+            val notePos = noteList.indexOf(it)
+            noteList.remove(it)
             syncLists()
-            notesAdapter.notifyDataSetChanged()
+            notesAdapter.notifyItemRemoved(notePos)
+        }
+
+        homeViewModel.syncDBStatus.observe(this@HomeActivity){
+            homeViewModel.getNotesFromDB(currentUser)
+            binding.swipeRefreshView.isRefreshing = false
         }
     }
 
@@ -332,7 +344,7 @@ class HomeActivity : AppCompatActivity() {
         val content = noteBundle?.getString("content").toString()
         if(title.isNotEmpty() || content.isNotEmpty()){
             val newNote = Note(title,content)
-            homeViewModel.addNoteToDB(newNote,currentUser)
+            homeViewModel.addNoteToDB(this@HomeActivity,newNote,currentUser)
         }
         else{
             Utilities.displayToast(this@HomeActivity,getString(R.string.empty_note_discarded))
@@ -347,7 +359,7 @@ class HomeActivity : AppCompatActivity() {
         if(title.isNotEmpty() || content.isNotEmpty()){
             val updateNote = noteList.find { it.id == id}!!
             val note = Note(title,content,updateNote.id,updateNote.firebaseId)
-            homeViewModel.updateNoteInDB(note,currentUser)
+            homeViewModel.updateNoteInDB(this@HomeActivity,note,currentUser)
         }
         else{
             handleDeleteNote(noteBundle)
@@ -357,7 +369,7 @@ class HomeActivity : AppCompatActivity() {
     private fun handleDeleteNote(noteBundle: Bundle?) {
         val id = noteBundle?.getLong("id")
         val deleteNote = noteList.find { it.id == id}!!
-        homeViewModel.deleteNoteFromDB(deleteNote,currentUser)
+        homeViewModel.deleteNoteFromDB(this@HomeActivity,deleteNote,currentUser)
     }
 
     private fun syncLists(){

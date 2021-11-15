@@ -5,6 +5,7 @@ import com.example.fundo.common.Logger
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.data.room.FunDoDatabase
+import com.example.fundo.data.services.DatabaseService
 import com.facebook.AccessToken
 import com.facebook.login.LoginManager
 import com.google.firebase.auth.*
@@ -79,9 +80,9 @@ object FirebaseAuthService {
             }
     }
 
-    fun signOut(context:Context,callback: (Boolean) -> Unit) {
+    suspend fun signOut(context:Context,callback: (Boolean) -> Unit) {
         SharedPrefUtil.clearAll()
-        FunDoDatabase.getDatabase(context).clearAll()
+        DatabaseService.clearLocalDB()
         auth.signOut()
         LoginManager.getInstance().logOut()
         callback(true)

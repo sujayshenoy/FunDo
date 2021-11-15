@@ -6,27 +6,35 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.fundo.config.Constants.DATABASE_NAME
+import com.example.fundo.config.Constants.DATABASE_VER
 import com.example.fundo.data.room.daos.NoteDao
+import com.example.fundo.data.room.daos.OpDao
 import com.example.fundo.data.room.daos.UserDao
 import com.example.fundo.data.room.entities.NoteEntity
+import com.example.fundo.data.room.entities.OpEntity
 import com.example.fundo.data.room.entities.UserEntity
 
-@Database(entities = [UserEntity::class,NoteEntity::class],version = 1,exportSchema = false)
+@Database(
+    entities = [UserEntity::class, NoteEntity::class, OpEntity::class],
+    version = DATABASE_VER,
+    exportSchema = false
+)
 @TypeConverters(DateTypeConverters::class)
-abstract class FunDoDatabase:RoomDatabase() {
-    abstract fun userDao() : UserDao
-    abstract fun noteDao() : NoteDao
+abstract class FunDoDatabase : RoomDatabase() {
+    abstract fun userDao(): UserDao
+    abstract fun noteDao(): NoteDao
+    abstract fun opDao(): OpDao
 
     companion object {
         @Volatile
-        private var INSTANCE: FunDoDatabase?= null
+        private var INSTANCE: FunDoDatabase? = null
 
-        fun getDatabase(context: Context): FunDoDatabase{
+        fun getDatabase(context: Context): FunDoDatabase {
             val tempInstance = INSTANCE
-            if(tempInstance!=null){
+            if (tempInstance != null) {
                 return tempInstance
             }
-            synchronized(this){
+            synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     FunDoDatabase::class.java,
@@ -38,7 +46,7 @@ abstract class FunDoDatabase:RoomDatabase() {
         }
     }
 
-    fun clearAll(){
+    fun clearAll() {
         this.clearAllTables()
     }
 }

@@ -1,11 +1,11 @@
 package com.example.fundo.ui.authentication.login
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fundo.auth.services.FirebaseAuthService
-import com.example.fundo.common.Logger
 import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.data.services.DatabaseService
 import com.facebook.AccessToken
@@ -19,13 +19,13 @@ class LoginViewModel:ViewModel() {
     private val _facebookLoginStatus = MutableLiveData<Boolean>()
     val facebookLoginStatus = _facebookLoginStatus as LiveData<Boolean>
 
-    fun loginWithEmailAndPassword(email:String,password:String) {
+    fun loginWithEmailAndPassword(context: Context,email:String,password:String) {
         FirebaseAuthService.signInWithEmailAndPassword(email,password){ user ->
             viewModelScope.launch(Dispatchers.IO){
                 if(user != null) {
                     DatabaseService.addUserToDB(user)?.let {
                         SharedPrefUtil.addUserId(it.id)
-                        DatabaseService.addCloudDataToLocalDB(it)
+                        DatabaseService.addCloudDataToLocalDB(context,it)
                     }
                     _emailPassLoginStatus.postValue(true)
                 }
@@ -36,7 +36,7 @@ class LoginViewModel:ViewModel() {
         }
     }
 
-    fun loginWithFacebook(accessToken: AccessToken) {
+    fun loginWithFacebook(context: Context,accessToken: AccessToken) {
         FirebaseAuthService.handleFacebookLogin(accessToken){ user ->
             viewModelScope.launch(Dispatchers.IO) {
                 if (user != null) {
@@ -45,7 +45,7 @@ class LoginViewModel:ViewModel() {
                     }
                     DatabaseService.addUserToDB(user)?.let {
                         SharedPrefUtil.addUserId(it.id)
-                        DatabaseService.addCloudDataToLocalDB(it)
+                        DatabaseService.addCloudDataToLocalDB(context,it)
                     }
                     _facebookLoginStatus.postValue(true)
                 }

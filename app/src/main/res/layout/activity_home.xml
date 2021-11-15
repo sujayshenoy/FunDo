@@ -33,14 +33,20 @@
                     app:title="@string/app_name" />
             </com.google.android.material.appbar.AppBarLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/notesRecyclerView"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/toolBarLayout"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/notesRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </RelativeLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

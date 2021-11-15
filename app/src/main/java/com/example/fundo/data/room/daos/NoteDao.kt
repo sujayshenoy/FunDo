@@ -17,4 +17,7 @@ interface NoteDao {
 
     @Delete
     suspend fun deleteNote(noteEntity: NoteEntity)
+
+    @Query("DELETE from note")
+    suspend fun nukeTable()
 }

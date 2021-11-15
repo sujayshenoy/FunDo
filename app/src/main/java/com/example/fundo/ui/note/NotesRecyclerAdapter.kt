@@ -23,9 +23,13 @@ class NotesRecyclerAdapter(private val notesList:List<Note>): RecyclerView.Adapt
 
         if(currentNote.title.isEmpty()){
             holder.titleText.visibility = View.GONE
+        } else {
+            holder.titleText.visibility = View.VISIBLE
         }
-        else if(currentNote.content.isEmpty()){
+        if(currentNote.content.isEmpty()){
             holder.contentText.visibility = View.GONE
+        } else {
+            holder.contentText.visibility = View.VISIBLE
         }
     }
 

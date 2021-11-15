@@ -8,6 +8,7 @@ object Logger : LoggerInterface {
     private const val AUTH_LOG_TAG = "Authentication"
     private const val LOG_TAG = "Custom Log"
     private const val STORAGE_LOG_TAG = "Storage"
+    private const val NETWORK_LOG_TAG = "Network"
 
     override fun logDbError(message: String) {
         Log.e(DB_LOG_TAG,message)
@@ -39,6 +40,14 @@ object Logger : LoggerInterface {
 
     override fun logInfo(message: String) {
         Log.i(LOG_TAG,message)
+    }
+
+    override fun logNetworkError(message: String) {
+        Log.e(NETWORK_LOG_TAG,message)
+    }
+
+    override fun logNetworkInfo(message: String) {
+        Log.i(NETWORK_LOG_TAG,message)
     }
 
 }

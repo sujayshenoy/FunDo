@@ -7,9 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fundo.auth.services.FirebaseAuthService
+import com.example.fundo.common.Logger
 import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.data.services.DatabaseService
 import com.example.fundo.data.services.StorageService
+import com.example.fundo.data.services.SyncDB
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +43,9 @@ class HomeViewModel:ViewModel() {
     private val _getUserFromDB = MutableLiveData<User>()
     val getUserFromDB = _getUserFromDB as LiveData<User>
 
+    private val _syncDBStatus = MutableLiveData<Boolean>()
+    val syncDBStatus = _syncDBStatus as LiveData<Boolean>
+
     fun setGoToAuthenticationActivity(status:Boolean) {
         _goToAuthenticationActivity.value = status
     }
@@ -69,25 +74,25 @@ class HomeViewModel:ViewModel() {
         }
     }
 
-    fun addNoteToDB(note: Note,user: User){
+    fun addNoteToDB(context: Context,note: Note,user: User){
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.addNoteToDB(note,user).also {
+            DatabaseService.addNoteToDB(context,note,user).also {
                 _addNoteToDB.postValue(it)
             }
         }
     }
 
-    fun updateNoteInDB(note: Note,user: User){
+    fun updateNoteInDB(context: Context,note: Note,user: User){
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.updateNoteInDB(note,user).also {
+            DatabaseService.updateNoteInDB(context,note,user).also {
                 _updateNoteInDB.postValue(it)
             }
         }
     }
 
-    fun deleteNoteFromDB(note: Note,user: User){
+    fun deleteNoteFromDB(context: Context,note: Note,user: User){
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.deleteNoteFromDB(note,user).also {
+            DatabaseService.deleteNoteFromDB(context,note,user).also {
                 _deleteNoteFromDB.postValue(it)
             }
         }
@@ -116,6 +121,15 @@ class HomeViewModel:ViewModel() {
                 val user = DatabaseService.getUserFromDB(userId)
                 _getUserFromDB.postValue(user)
             }
+        }
+    }
+
+    fun syncDB(context: Context,user: User) {
+        viewModelScope.launch {
+            Logger.logInfo("Starting sync")
+            SyncDB.syncNow(context, user)
+            _syncDBStatus.postValue(true)
+            Logger.logInfo("Sync Complete")
         }
     }
 }

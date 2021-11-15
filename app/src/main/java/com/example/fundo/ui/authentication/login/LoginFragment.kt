@@ -8,13 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.common.Logger
-import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.databinding.FragmentLoginBinding
 import com.example.fundo.ui.authentication.AuthenticationSharedViewModel
 import com.example.fundo.common.Utilities
 import com.example.fundo.common.Validators
-import com.example.fundo.data.services.DatabaseService
-import com.example.fundo.data.wrappers.User
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -86,7 +83,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
                 override fun onSuccess(result: LoginResult) {
                     Logger.logAuthInfo("facebook:onSuccess")
-                    loginViewModel.loginWithFacebook(result.accessToken)
+                    loginViewModel.loginWithFacebook(requireContext(),result.accessToken)
                 }
             })
         }
@@ -98,7 +95,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val password = binding.passwordTextEdit
 
         if(Validators.logInValidator(requireContext(),email,password)){
-            loginViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
+            loginViewModel.loginWithEmailAndPassword(requireContext(),email.text.toString(),password.text.toString())
         }
         else{
             dialog.dismiss()
