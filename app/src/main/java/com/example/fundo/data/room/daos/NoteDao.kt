@@ -7,10 +7,10 @@ import com.example.fundo.data.room.entities.NoteEntity
 interface NoteDao {
 
     @Insert
-    suspend fun addNote(noteEntity: NoteEntity):Long
+    suspend fun addNote(noteEntity: NoteEntity): Long
 
     @Query("SELECT * from note")
-    suspend fun getNotes():List<NoteEntity>
+    suspend fun getNotes(): List<NoteEntity>
 
     @Update
     suspend fun updateNote(noteEntity: NoteEntity)

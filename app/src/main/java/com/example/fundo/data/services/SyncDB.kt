@@ -8,60 +8,57 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-object SyncDB {
-    suspend fun syncNow(context: Context,user: User){
-        val latestNotes = getLatestNotesFromDB(context,user)
-        DatabaseService.clearNoteAndOp()
-        latestNotes.forEach{
-            DatabaseService.addNoteToLocalDB(context,it,user)
+class SyncDB(private val context: Context) {
+    suspend fun syncNow(user: User) {
+        val latestNotes = getLatestNotesFromDB(user)
+        DatabaseService.getInstance(context).clearNoteAndOp()
+        latestNotes.forEach {
+            DatabaseService.getInstance(context).addNoteToLocalDB(it, user)
         }
     }
 
-    private suspend fun getLatestNotesFromDB(context: Context, user: User) : List<Note>{
-       return withContext(Dispatchers.IO){
-            val sqlNotesList = DatabaseService.getNotesFromDB(user)
+    private suspend fun getLatestNotesFromDB(user: User): List<Note> {
+        return withContext(Dispatchers.IO) {
+            val sqlNotesList = DatabaseService.getInstance(context).getNotesFromDB(user)
             val localNotesList = mutableListOf<Note>()
-            if(sqlNotesList != null){
+            if (sqlNotesList != null) {
                 localNotesList.addAll(sqlNotesList)
             }
-            val cloudNotesList = DatabaseService.getNotesFromCloud(user)
+            val cloudNotesList = DatabaseService.getInstance(context).getNotesFromCloud(user)
             val latestNotes = mutableListOf<Note>()
 
-            if(cloudNotesList != null){
-                for(cloudNote in cloudNotesList){
+            if (cloudNotesList != null) {
+                for (cloudNote in cloudNotesList) {
                     var localNoteIndexCounter = 0
-                    for(localNote in localNotesList){
-                        if(cloudNote.firebaseId == localNote.firebaseId){
-                            val res = compareTimeStamp(localNote,cloudNote)
-                            if(res){
+                    for (localNote in localNotesList) {
+                        if (cloudNote.firebaseId == localNote.firebaseId) {
+                            val res = compareTimeStamp(localNote, cloudNote)
+                            if (res) {
                                 latestNotes.add(localNote)
                                 FirebaseDatabaseService.updateNoteInDB(
-                                    context,
                                     localNote,
                                     user,
                                     localNote.lastModified
                                 )
-                            }
-                            else{
+                            } else {
                                 latestNotes.add(cloudNote)
                             }
                             break
                         }
                         localNoteIndexCounter++
                     }
-                    if(localNoteIndexCounter == localNotesList.size){
+                    if (localNoteIndexCounter == localNotesList.size) {
                         localNotesList.add(cloudNote)
                         latestNotes.add(cloudNote)
                     }
                 }
 
-                for(localNote in localNotesList){
+                for (localNote in localNotesList) {
                     var cloudNoteIndexCounter = 0
-                    for(cloudNote in cloudNotesList){
-                        if(localNote.firebaseId == cloudNote.firebaseId){
-                            if(getOpCode(localNote) == DELETE_OP_CODE){
+                    for (cloudNote in cloudNotesList) {
+                        if (localNote.firebaseId == cloudNote.firebaseId) {
+                            if (getOpCode(localNote) == DELETE_OP_CODE) {
                                 FirebaseDatabaseService.deleteNoteFromDB(
-                                    context,
                                     localNote,
                                     user,
                                     Date(System.currentTimeMillis())
@@ -72,12 +69,11 @@ object SyncDB {
                         }
                         cloudNoteIndexCounter++
                     }
-                    if(cloudNoteIndexCounter == cloudNotesList.size){
+                    if (cloudNoteIndexCounter == cloudNotesList.size) {
                         val opCode = getOpCode(localNote)
-                        if(opCode != -1){
+                        if (opCode != -1) {
                             latestNotes.add(localNote)
                             FirebaseDatabaseService.addNoteToDB(
-                                context,
                                 localNote,
                                 user,
                                 localNote.lastModified
@@ -86,25 +82,24 @@ object SyncDB {
                     }
                 }
                 return@withContext latestNotes
-            }
-           else{
-               return@withContext listOf<Note>()
+            } else {
+                return@withContext listOf<Note>()
             }
         }
     }
 
     private suspend fun getOpCode(localNote: Note): Int {
-        return withContext(Dispatchers.IO){
-            return@withContext DatabaseService.getOpCode(localNote)
+        return withContext(Dispatchers.IO) {
+            return@withContext DatabaseService.getInstance(context).getOpCode(localNote)
         }
     }
 
     private fun compareTimeStamp(localNote: Note, cloudNote: Note): Boolean {
         val localDate = localNote.lastModified
         val cloudDate = cloudNote.lastModified
-        return if(localDate != null && cloudDate != null){
+        return if (localDate != null && cloudDate != null) {
             localDate.after(cloudDate)
-        }else{
+        } else {
             false
         }
     }

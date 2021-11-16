@@ -1,7 +1,6 @@
 package com.example.fundo.data.services
 
 import android.content.Context
-import com.example.fundo.common.Logger
 import com.example.fundo.common.NetworkService
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
@@ -11,20 +10,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-object DatabaseService : DatabaseInterface {
-    private lateinit var sqLiteDatabaseService: SqLiteDatabaseService
+class DatabaseService(private val context: Context) : DatabaseInterface {    //to singleton
+    private val sqLiteDatabaseService: SqLiteDatabaseService = SqLiteDatabaseService(context)
 
-    fun initSQLiteDatabase(context: Context) {
-        sqLiteDatabaseService = SqLiteDatabaseService(context)
+    companion object {
+        private val instance: DatabaseService? by lazy { null }
+
+        fun getInstance(context: Context): DatabaseService = instance ?: DatabaseService(context)
     }
 
-    suspend fun addCloudDataToLocalDB(context: Context, user: User): Boolean {
+    suspend fun addCloudDataToLocalDB(user: User): Boolean {
         return withContext(Dispatchers.IO) {
             val noteListFromCloud = FirebaseDatabaseService.getNotesFromDB(user)
             if (noteListFromCloud != null) {
                 for (i in noteListFromCloud) {
                     sqLiteDatabaseService.addNoteToDB(
-                        context,
                         i,
                         timeStamp = Date(System.currentTimeMillis())
                     )
@@ -79,10 +79,10 @@ object DatabaseService : DatabaseInterface {
         }
     }
 
-    suspend fun addNoteToLocalDB(context: Context,note: Note,user: User?) : Note?{
+    suspend fun addNoteToLocalDB(note: Note, user: User?): Note? {
         return try {
             return withContext(Dispatchers.IO) {
-                return@withContext sqLiteDatabaseService.addNoteToDB(context,note,user,note.lastModified)
+                return@withContext sqLiteDatabaseService.addNoteToDB(note, user, note.lastModified)
             }
         } catch (ex: FirebaseException) {
             ex.printStackTrace()
@@ -91,7 +91,6 @@ object DatabaseService : DatabaseInterface {
     }
 
     override suspend fun addNoteToDB(
-        context: Context,
         note: Note,
         user: User?,
         timeStamp: Date?,
@@ -102,19 +101,16 @@ object DatabaseService : DatabaseInterface {
                 val now = Date(System.currentTimeMillis())
                 if (NetworkService.isNetworkConnected(context)) {
                     val newNote = FirebaseDatabaseService.addNoteToDB(
-                        context,
                         note,
                         user,
                         timeStamp = now
                     )!!
                     return@withContext sqLiteDatabaseService.addNoteToDB(
-                        context,
                         newNote,
                         timeStamp = now
                     )
                 } else {
                     return@withContext sqLiteDatabaseService.addNoteToDB(
-                        context,
                         note,
                         timeStamp = now,
                         onlineMode = false
@@ -138,7 +134,7 @@ object DatabaseService : DatabaseInterface {
         }
     }
 
-    suspend fun getNotesFromCloud(user: User?):List<Note>? {
+    suspend fun getNotesFromCloud(user: User?): List<Note>? {
         return try {
             return withContext(Dispatchers.IO) {
                 return@withContext FirebaseDatabaseService.getNotesFromDB(user)
@@ -150,7 +146,6 @@ object DatabaseService : DatabaseInterface {
     }
 
     override suspend fun updateNoteInDB(
-        context: Context,
         note: Note,
         user: User?,
         timeStamp: Date?,
@@ -161,19 +156,16 @@ object DatabaseService : DatabaseInterface {
                 val now = Date(System.currentTimeMillis())
                 if (NetworkService.isNetworkConnected(context)) {
                     val updatedNote = FirebaseDatabaseService.updateNoteInDB(
-                        context,
                         note,
                         user,
                         timeStamp = now
                     )!!
                     return@withContext sqLiteDatabaseService.updateNoteInDB(
-                        context,
                         updatedNote,
                         timeStamp = now
                     )
                 } else {
                     return@withContext sqLiteDatabaseService.updateNoteInDB(
-                        context,
                         note,
                         timeStamp = now,
                         onlineMode = false
@@ -187,7 +179,6 @@ object DatabaseService : DatabaseInterface {
     }
 
     override suspend fun deleteNoteFromDB(
-        context: Context,
         note: Note,
         user: User?,
         timeStamp: Date?,
@@ -198,19 +189,16 @@ object DatabaseService : DatabaseInterface {
                 val now = Date(System.currentTimeMillis())
                 if (NetworkService.isNetworkConnected(context)) {
                     val deletedNote = FirebaseDatabaseService.deleteNoteFromDB(
-                        context,
                         note,
                         user,
                         timeStamp = now
                     )!!
                     return@withContext sqLiteDatabaseService.deleteNoteFromDB(
-                        context,
                         deletedNote,
                         timeStamp = now
                     )
                 } else {
                     return@withContext sqLiteDatabaseService.deleteNoteFromDB(
-                        context,
                         note,
                         timeStamp = now,
                         onlineMode = false
@@ -223,18 +211,17 @@ object DatabaseService : DatabaseInterface {
         }
     }
 
-    suspend fun getOpCode(note: Note):Int{
-        return withContext(Dispatchers.IO){
-            val opCode = sqLiteDatabaseService.getOpCode(note)
-            return@withContext opCode
+    suspend fun getOpCode(note: Note): Int {
+        return withContext(Dispatchers.IO) {
+            return@withContext sqLiteDatabaseService.getOpCode(note)
         }
     }
 
-    suspend fun clearNoteAndOp(){
+    suspend fun clearNoteAndOp() {
         sqLiteDatabaseService.clearNoteAndOp()
     }
 
-    fun clearLocalDB(){
+    fun clearLocalDB() {
         sqLiteDatabaseService.clearAll()
     }
 }

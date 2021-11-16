@@ -10,25 +10,24 @@ import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
 import kotlin.coroutines.suspendCoroutine
 
-object StorageService : CloudStorage {
+object CloudStorageService : CloudStorage {
     private val storageRef = Firebase.storage.reference
     private val imagesRef = storageRef.child("images")
 
-    override suspend fun addUserAvatar(bitmap: Bitmap): Boolean {
+    override suspend fun setUserAvatar(bitmap: Bitmap): Boolean {
         val userImagesRef = imagesRef.child("users")
             .child(FirebaseAuthService.getCurrentUser()?.uid.toString()).child("avatar.webp")
         val baos = ByteArrayOutputStream()
 
         return suspendCoroutine {
-            bitmap.compress(Bitmap.CompressFormat.WEBP,80,baos)
+            bitmap.compress(Bitmap.CompressFormat.WEBP, 80, baos)
             val data = baos.toByteArray()
 
             val uploadTask = userImagesRef.putBytes(data)
-            uploadTask.addOnCompleteListener{ task ->
-                if(task.isSuccessful){
+            uploadTask.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     it.resumeWith(Result.success(true))
-                }
-                else{
+                } else {
                     Logger.logStorageError("FirebaseStorage: Add user avatar failed")
                     it.resumeWith(Result.failure(task.exception!!))
                 }
@@ -42,7 +41,7 @@ object StorageService : CloudStorage {
 
         return suspendCoroutine {
             userImagesRef.getBytes(5000000).addOnSuccessListener { byteArray ->
-                val bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
+                val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
                 Logger.logStorageInfo("fetched image from storage for ${FirebaseAuthService.getCurrentUser()?.uid}")
                 it.resumeWith(Result.success(bitmap))
             }.addOnFailureListener { exception ->

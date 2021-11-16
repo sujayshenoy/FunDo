@@ -10,7 +10,7 @@ import com.example.fundo.ui.home.HomeActivity
 import com.example.fundo.common.SharedPrefUtil
 import kotlinx.coroutines.*
 
-class SplashScreenActivity: AppCompatActivity() {
+class SplashScreenActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,16 +20,15 @@ class SplashScreenActivity: AppCompatActivity() {
         setContentView(binding.root)
 
         SharedPrefUtil.initSharedPref(this@SplashScreenActivity)
-        DatabaseService.initSQLiteDatabase(this@SplashScreenActivity)
+
         val splashScreenIcon = binding.splashScreenIcon
         splashScreenIcon.alpha = 0f
-        splashScreenIcon.animate().setDuration(500).alpha(1f).withEndAction{
-            if(SharedPrefUtil.getUserId() == 0L){
+        splashScreenIcon.animate().setDuration(500).alpha(1f).withEndAction {
+            if (SharedPrefUtil.getUserId() == 0L) {
                 val intent = Intent(this@SplashScreenActivity, AuthenticationActivity::class.java)
                 finish()
                 startActivity(intent)
-            }
-            else{
+            } else {
                 CoroutineScope(Dispatchers.IO).launch(Dispatchers.IO) {
                     val intent = Intent(this@SplashScreenActivity, HomeActivity::class.java)
                     finish()

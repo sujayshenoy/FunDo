@@ -12,44 +12,42 @@ import com.facebook.AccessToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LoginViewModel:ViewModel() {
+class LoginViewModel : ViewModel() {
     private val _emailPassLoginStatus = MutableLiveData<Boolean>()
     val emailPassLoginStatus = _emailPassLoginStatus as LiveData<Boolean>
 
     private val _facebookLoginStatus = MutableLiveData<Boolean>()
     val facebookLoginStatus = _facebookLoginStatus as LiveData<Boolean>
 
-    fun loginWithEmailAndPassword(context: Context,email:String,password:String) {
-        FirebaseAuthService.signInWithEmailAndPassword(email,password){ user ->
-            viewModelScope.launch(Dispatchers.IO){
-                if(user != null) {
-                    DatabaseService.addUserToDB(user)?.let {
+    fun loginWithEmailAndPassword(context: Context, email: String, password: String) {
+        FirebaseAuthService.signInWithEmailAndPassword(email, password) { user ->
+            viewModelScope.launch(Dispatchers.IO) {
+                if (user != null) {
+                    DatabaseService.getInstance(context).addUserToDB(user)?.let {
                         SharedPrefUtil.addUserId(it.id)
-                        DatabaseService.addCloudDataToLocalDB(context,it)
+                        DatabaseService.getInstance(context).addCloudDataToLocalDB(it)
                     }
                     _emailPassLoginStatus.postValue(true)
-                }
-                else{
+                } else {
                     _emailPassLoginStatus.postValue(false)
                 }
             }
         }
     }
 
-    fun loginWithFacebook(context: Context,accessToken: AccessToken) {
-        FirebaseAuthService.handleFacebookLogin(accessToken){ user ->
+    fun loginWithFacebook(context: Context, accessToken: AccessToken) {
+        FirebaseAuthService.handleFacebookLogin(accessToken) { user ->
             viewModelScope.launch(Dispatchers.IO) {
                 if (user != null) {
-                    if(!DatabaseService.checkUserInCloudDB(user.firebaseId)){
-                        DatabaseService.addUserToCloudDB(user)
+                    if (!DatabaseService.getInstance(context).checkUserInCloudDB(user.firebaseId)) {
+                        DatabaseService.getInstance(context).addUserToCloudDB(user)
                     }
-                    DatabaseService.addUserToDB(user)?.let {
+                    DatabaseService.getInstance(context).addUserToDB(user)?.let {
                         SharedPrefUtil.addUserId(it.id)
-                        DatabaseService.addCloudDataToLocalDB(context,it)
+                        DatabaseService.getInstance(context).addCloudDataToLocalDB(it)
                     }
                     _facebookLoginStatus.postValue(true)
-                }
-                else{
+                } else {
                     _facebookLoginStatus.postValue(false)
                 }
             }

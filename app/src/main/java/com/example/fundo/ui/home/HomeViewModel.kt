@@ -10,7 +10,7 @@ import com.example.fundo.auth.services.FirebaseAuthService
 import com.example.fundo.common.Logger
 import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.data.services.DatabaseService
-import com.example.fundo.data.services.StorageService
+import com.example.fundo.data.services.CloudStorageService
 import com.example.fundo.data.services.SyncDB
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
@@ -18,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class HomeViewModel:ViewModel() {
+class HomeViewModel : ViewModel() {
     private var _logoutStatus = MutableLiveData<Boolean>()
     var logoutStatus = _logoutStatus as LiveData<Boolean>
 
@@ -28,108 +28,59 @@ class HomeViewModel:ViewModel() {
     private var _setUserAvatarStatus = MutableLiveData<Bitmap>()
     val setUserAvatarStatus = _setUserAvatarStatus as LiveData<Bitmap>
 
-    private val _addNoteToDB = MutableLiveData<Note>()
-    val addNoteToDB = _addNoteToDB as LiveData<Note>
-
-    private val _getNotesFromDB = MutableLiveData<List<Note>>()
-    val getNotesFromDB = _getNotesFromDB as LiveData<List<Note>>
-
-    private val _updateNoteInDB = MutableLiveData<Note>()
-    val updateNoteInDB = _updateNoteInDB as LiveData<Note>
-
-    private val _deleteNoteFromDB = MutableLiveData<Note>()
-    val deleteNoteFromDB = _deleteNoteFromDB as LiveData<Note>
-
     private val _getUserFromDB = MutableLiveData<User>()
     val getUserFromDB = _getUserFromDB as LiveData<User>
 
-    private val _syncDBStatus = MutableLiveData<Boolean>()
-    val syncDBStatus = _syncDBStatus as LiveData<Boolean>
+    private val _goToNotesList = MutableLiveData<Boolean>()
+    val goToNotesList = _goToNotesList as LiveData<Boolean>
 
-    fun setGoToAuthenticationActivity(status:Boolean) {
+    fun goToAuthenticationActivity(status: Boolean) {
         _goToAuthenticationActivity.value = status
     }
 
-    fun setUserAvatar(bitmap: Bitmap){
+    fun goToNotesListFragment() {
+        _goToNotesList.value = true
+    }
+
+    fun setUserAvatar(bitmap: Bitmap) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                StorageService.addUserAvatar(bitmap).also{
+                CloudStorageService.setUserAvatar(bitmap).also {
                     _setUserAvatarStatus.postValue(bitmap)
                 }
-            } catch (ex:Exception){
+            } catch (ex: Exception) {
                 ex.printStackTrace()
             }
         }
     }
 
-    fun getUserAvatar(){
+    fun getUserAvatar() {
         viewModelScope.launch(Dispatchers.IO) {
-            try{
-                StorageService.getUserAvatar().also {
+            try {
+                CloudStorageService.getUserAvatar().also {
                     _setUserAvatarStatus.postValue(it)
                 }
-            }catch (ex: Exception){
+            } catch (ex: Exception) {
                 ex.printStackTrace()
-            }
-        }
-    }
-
-    fun addNoteToDB(context: Context,note: Note,user: User){
-        viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.addNoteToDB(context,note,user).also {
-                _addNoteToDB.postValue(it)
-            }
-        }
-    }
-
-    fun updateNoteInDB(context: Context,note: Note,user: User){
-        viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.updateNoteInDB(context,note,user).also {
-                _updateNoteInDB.postValue(it)
-            }
-        }
-    }
-
-    fun deleteNoteFromDB(context: Context,note: Note,user: User){
-        viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.deleteNoteFromDB(context,note,user).also {
-                _deleteNoteFromDB.postValue(it)
-            }
-        }
-    }
-
-    fun getNotesFromDB(user: User){
-        viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.getNotesFromDB(user).let {
-                _getNotesFromDB.postValue(it)
             }
         }
     }
 
     fun logout(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            FirebaseAuthService.signOut(context){
+            FirebaseAuthService.signOut(context) {
                 _logoutStatus.postValue(it)
             }
         }
     }
 
-    fun getUserFromDB() {
-        viewModelScope.launch{
+    fun getUserFromDB(context: Context) {
+        viewModelScope.launch {
             val userId = SharedPrefUtil.getUserId()
-            if(userId > 0){
-                val user = DatabaseService.getUserFromDB(userId)
+            if (userId > 0) {
+                val user = DatabaseService.getInstance(context).getUserFromDB(userId)
                 _getUserFromDB.postValue(user)
             }
-        }
-    }
-
-    fun syncDB(context: Context,user: User) {
-        viewModelScope.launch {
-            Logger.logInfo("Starting sync")
-            SyncDB.syncNow(context, user)
-            _syncDBStatus.postValue(true)
-            Logger.logInfo("Sync Complete")
         }
     }
 }

@@ -12,7 +12,7 @@ interface OpDao {
     suspend fun addOp(opEntity: OpEntity): Long
 
     @Query("SELECT * from operation WHERE fid = :noteId")
-    suspend fun getOpCode(noteId:String): OpEntity
+    suspend fun getOpCode(noteId: String): OpEntity
 
     @Query("DELETE from operation")
     suspend fun nukeOp()

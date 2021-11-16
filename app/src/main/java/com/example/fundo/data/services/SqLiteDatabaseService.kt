@@ -49,7 +49,6 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
     }
 
     override suspend fun addNoteToDB(
-        context: Context,
         note: Note,
         user: User?,
         timeStamp: Date?,
@@ -87,7 +86,6 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
     }
 
     override suspend fun updateNoteInDB(
-        context: Context,
         note: Note,
         user: User?,
         timeStamp: Date?,
@@ -112,7 +110,6 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
     }
 
     override suspend fun deleteNoteFromDB(
-        context: Context,
         note: Note,
         user: User?,
         timeStamp: Date?,
@@ -128,7 +125,7 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
             )
             noteDao.deleteNote(noteEntity)
             if (!onlineMode) {
-                if(note.firebaseId.isNotEmpty()){
+                if (note.firebaseId.isNotEmpty()) {
                     val opEntity = OpEntity(note.firebaseId, DELETE_OP_CODE)
                     opDao.addOp(opEntity)
                 }
@@ -137,23 +134,23 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
         }
     }
 
-    suspend fun getOpCode(note: Note): Int{
-        return withContext(Dispatchers.IO){
+    suspend fun getOpCode(note: Note): Int {
+        return withContext(Dispatchers.IO) {
             val opc = opDao.getOpCode(note.firebaseId)
-            if(opc != null){
+            if (opc != null) {
                 return@withContext opc.op
-            } else{
-              return@withContext -1
+            } else {
+                return@withContext -1
             }
         }
     }
 
-    suspend fun clearNoteAndOp(){
+    suspend fun clearNoteAndOp() {
         noteDao.nukeTable()
         opDao.nukeOp()
     }
 
-    fun clearAll(){
+    fun clearAll() {
         funDoDatabase.clearAll()
     }
 }

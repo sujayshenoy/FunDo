@@ -1,8 +1,7 @@
 package com.example.fundo.data.services
 
-import android.content.Context
-import com.example.fundo.data.models.DBNote
-import com.example.fundo.data.models.DBUser
+import com.example.fundo.data.models.CloudDBNote
+import com.example.fundo.data.models.CloudDBUser
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.common.Utilities
 import com.example.fundo.data.wrappers.Note
@@ -21,7 +20,7 @@ import kotlin.coroutines.suspendCoroutine
 object FirebaseDatabaseService : DatabaseInterface {
     private val database = Firebase.database.reference
     override suspend fun addUserToDB(user: User): User? {
-        val userDB = DBUser(user.name, user.email, user.phone)
+        val userDB = CloudDBUser(user.name, user.email, user.phone)
         return suspendCoroutine {
             database.child("users").child(user.firebaseId)
                 .setValue(userDB).addOnCompleteListener { task ->
@@ -45,12 +44,12 @@ object FirebaseDatabaseService : DatabaseInterface {
                         } else {
                             it.resumeWith(Result.success(false))
                         }
-                }
+                    }
 
-                override fun onCancelled(error: DatabaseError) {
-                    it.resumeWith(Result.failure(error.toException()))
-                }
-            })
+                    override fun onCancelled(error: DatabaseError) {
+                        it.resumeWith(Result.failure(error.toException()))
+                    }
+                })
         }
     }
 
@@ -80,13 +79,12 @@ object FirebaseDatabaseService : DatabaseInterface {
     }
 
     override suspend fun addNoteToDB(
-        context: Context,
         note: Note,
         user: User?,
         timeStamp: Date?,
         onlineMode: Boolean
     ): Note? {
-        val dbNote = DBNote(
+        val dbNote = CloudDBNote(
             note.title,
             note.content,
             DateTypeConverters().fromDateTime(timeStamp).toString()
@@ -133,7 +131,6 @@ object FirebaseDatabaseService : DatabaseInterface {
     }
 
     override suspend fun updateNoteInDB(
-        context: Context,
         note: Note,
         user: User?,
         timeStamp: Date?,
@@ -160,7 +157,6 @@ object FirebaseDatabaseService : DatabaseInterface {
     }
 
     override suspend fun deleteNoteFromDB(
-        context: Context,
         note: Note,
         user: User?,
         timeStamp: Date?,

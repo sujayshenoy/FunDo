@@ -21,40 +21,44 @@ class AuthenticationActivity : AppCompatActivity() {
 
         binding = ActivityAuthenticationBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        authenticationSharedViewModel = ViewModelProvider(this@AuthenticationActivity)[AuthenticationSharedViewModel::class.java]
+        authenticationSharedViewModel =
+            ViewModelProvider(this@AuthenticationActivity)[AuthenticationSharedViewModel::class.java]
         attachObservers()
 
         authenticationSharedViewModel.setGoToLoginScreenStatus(true)
     }
 
     private fun attachObservers() {
-        authenticationSharedViewModel.goToLoginScreen.observe(this@AuthenticationActivity,{
-            if(it){
-                Utilities.fragmentSwitcher(supportFragmentManager,R.id.authFragmentContainer,
+        authenticationSharedViewModel.goToLoginScreen.observe(this@AuthenticationActivity, {
+            if (it) {
+                Utilities.fragmentSwitcher(
+                    supportFragmentManager, R.id.authFragmentContainer,
                     LoginFragment()
                 )
             }
         })
 
-        authenticationSharedViewModel.goToSignUpScreen.observe(this@AuthenticationActivity,{
-            if(it){
-                Utilities.fragmentSwitcher(supportFragmentManager,R.id.authFragmentContainer,
+        authenticationSharedViewModel.goToSignUpScreen.observe(this@AuthenticationActivity, {
+            if (it) {
+                Utilities.fragmentSwitcher(
+                    supportFragmentManager, R.id.authFragmentContainer,
                     SignUpFragment()
                 )
             }
         })
 
-        authenticationSharedViewModel.goToResetPassword.observe(this@AuthenticationActivity,{
-            if(it){
-                Utilities.fragmentSwitcher(supportFragmentManager,R.id.authFragmentContainer,
+        authenticationSharedViewModel.goToResetPassword.observe(this@AuthenticationActivity, {
+            if (it) {
+                Utilities.fragmentSwitcher(
+                    supportFragmentManager, R.id.authFragmentContainer,
                     ResetPasswordFragment()
                 )
             }
         })
 
-        authenticationSharedViewModel.goToHome.observe(this@AuthenticationActivity,{
-            if(it){
-                val intent = Intent(this@AuthenticationActivity,HomeActivity::class.java)
+        authenticationSharedViewModel.goToHome.observe(this@AuthenticationActivity, {
+            if (it) {
+                val intent = Intent(this@AuthenticationActivity, HomeActivity::class.java)
                 finish()
                 startActivity(intent)
             }

@@ -11,43 +11,43 @@ object Logger : LoggerInterface {
     private const val NETWORK_LOG_TAG = "Network"
 
     override fun logDbError(message: String) {
-        Log.e(DB_LOG_TAG,message)
+        Log.e(DB_LOG_TAG, message)
     }
 
     override fun logDbInfo(message: String) {
-        Log.i(DB_LOG_TAG,message)
+        Log.i(DB_LOG_TAG, message)
     }
 
     override fun logAuthError(message: String) {
-        Log.e(AUTH_LOG_TAG,message)
+        Log.e(AUTH_LOG_TAG, message)
     }
 
     override fun logAuthInfo(message: String) {
-        Log.i(AUTH_LOG_TAG,message)
+        Log.i(AUTH_LOG_TAG, message)
     }
 
     override fun logStorageError(message: String) {
-        Log.e(STORAGE_LOG_TAG,message)
+        Log.e(STORAGE_LOG_TAG, message)
     }
 
     override fun logStorageInfo(message: String) {
-        Log.i(STORAGE_LOG_TAG,message)
+        Log.i(STORAGE_LOG_TAG, message)
     }
 
     override fun logError(message: String) {
-        Log.e(LOG_TAG,message)
+        Log.e(LOG_TAG, message)
     }
 
     override fun logInfo(message: String) {
-        Log.i(LOG_TAG,message)
+        Log.i(LOG_TAG, message)
     }
 
     override fun logNetworkError(message: String) {
-        Log.e(NETWORK_LOG_TAG,message)
+        Log.e(NETWORK_LOG_TAG, message)
     }
 
     override fun logNetworkInfo(message: String) {
-        Log.i(NETWORK_LOG_TAG,message)
+        Log.i(NETWORK_LOG_TAG, message)
     }
 
 }

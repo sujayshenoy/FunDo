@@ -18,8 +18,8 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginResult
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
-    private lateinit var binding:FragmentLoginBinding
-    private lateinit var callbackManager:CallbackManager
+    private lateinit var binding: FragmentLoginBinding
+    private lateinit var callbackManager: CallbackManager
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var authenticationSharedViewModel: AuthenticationSharedViewModel
 
@@ -32,7 +32,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         dialog.setContentView(R.layout.dialog_loading)
 
         loginViewModel = ViewModelProvider(this@LoginFragment)[LoginViewModel::class.java]
-        authenticationSharedViewModel = ViewModelProvider(requireActivity()
+        authenticationSharedViewModel = ViewModelProvider(
+            requireActivity()
         )[AuthenticationSharedViewModel::class.java]
 
         attachListeners()
@@ -40,11 +41,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     }
 
     private fun attachObservers() {
-        loginViewModel.emailPassLoginStatus.observe(viewLifecycleOwner){
+        loginViewModel.emailPassLoginStatus.observe(viewLifecycleOwner) {
             handleLogin(it)
         }
 
-        loginViewModel.facebookLoginStatus.observe(viewLifecycleOwner){
+        loginViewModel.facebookLoginStatus.observe(viewLifecycleOwner) {
             handleLogin(it)
         }
     }
@@ -52,40 +53,41 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        callbackManager.onActivityResult(requestCode,resultCode,data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun attachListeners() {
-        binding.forgotPasswordText.setOnClickListener{
+        binding.forgotPasswordText.setOnClickListener {
             authenticationSharedViewModel.setGoToResetPassword(true)
         }
 
-        binding.regLogChangeRText.setOnClickListener{
+        binding.regLogChangeRText.setOnClickListener {
             authenticationSharedViewModel.setGoToSignUpScreenStatus(true)
         }
 
-        binding.loginButton.setOnClickListener{
+        binding.loginButton.setOnClickListener {
             login()
         }
 
-        binding.facebookLoginButton.setOnClickListener{
+        binding.facebookLoginButton.setOnClickListener {
             var facebookLoginButton = binding.facebookLoginButton
-            facebookLoginButton.setReadPermissions("email","public_profile")
-            facebookLoginButton.registerCallback(callbackManager,object : FacebookCallback<LoginResult>{
-                override fun onCancel() {
-                    Logger.logAuthInfo("facebook:onCancel")
-                }
+            facebookLoginButton.setReadPermissions("email", "public_profile")
+            facebookLoginButton.registerCallback(callbackManager,
+                object : FacebookCallback<LoginResult> {
+                    override fun onCancel() {
+                        Logger.logAuthInfo("facebook:onCancel")
+                    }
 
-                override fun onError(error: FacebookException) {
-                    Logger.logAuthError("facebook:onError")
-                    Logger.logAuthError(error.toString())
-                }
+                    override fun onError(error: FacebookException) {
+                        Logger.logAuthError("facebook:onError")
+                        Logger.logAuthError(error.toString())
+                    }
 
-                override fun onSuccess(result: LoginResult) {
-                    Logger.logAuthInfo("facebook:onSuccess")
-                    loginViewModel.loginWithFacebook(requireContext(),result.accessToken)
-                }
-            })
+                    override fun onSuccess(result: LoginResult) {
+                        Logger.logAuthInfo("facebook:onSuccess")
+                        loginViewModel.loginWithFacebook(requireContext(), result.accessToken)
+                    }
+                })
         }
     }
 
@@ -94,26 +96,28 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val email = binding.usernameTextEdit
         val password = binding.passwordTextEdit
 
-        if(Validators.logInValidator(requireContext(),email,password)){
-            loginViewModel.loginWithEmailAndPassword(requireContext(),email.text.toString(),password.text.toString())
-        }
-        else{
+        if (Validators.logInValidator(requireContext(), email, password)) {
+            loginViewModel.loginWithEmailAndPassword(
+                requireContext(),
+                email.text.toString(),
+                password.text.toString()
+            )
+        } else {
             dialog.dismiss()
         }
     }
 
-    private fun handleLogin(status: Boolean){
-        if(status) {
-            Utilities.displayToast(requireContext(),getString(R.string.sign_in_success_toast))
+    private fun handleLogin(status: Boolean) {
+        if (status) {
+            Utilities.displayToast(requireContext(), getString(R.string.sign_in_success_toast))
             authenticationSharedViewModel.setGoToHome(true)
-        }
-        else {
-            Utilities.displayToast(requireContext(),getString(R.string.sign_in_failed_toast))
+        } else {
+            Utilities.displayToast(requireContext(), getString(R.string.sign_in_failed_toast))
         }
         dialog.dismiss()
     }
 
-    companion object{
-        lateinit var dialog:Dialog
+    companion object {
+        lateinit var dialog: Dialog
     }
 }
