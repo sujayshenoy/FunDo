@@ -2,17 +2,33 @@ package com.example.fundo.interfaces
 
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
+import java.util.*
 
 interface DatabaseInterface {
-    fun addUserToDB(user : User, callback : (Boolean) -> Unit)
+    suspend fun addUserToDB(user: User): User?
 
-    fun getUserFromDB(callback: (Boolean) -> Unit)
+    suspend fun getUserFromDB(userID: Long): User?
 
-    fun addNoteToDB(note: Note, callback: (Note?) -> Unit)
+    suspend fun addNoteToDB(
+        note: Note,
+        user: User? = null,
+        timeStamp: Date? = null,
+        onlineMode: Boolean = true
+    ): Note?
 
-    fun getNotesFromDB(callback: (List<Note>?) -> Unit)
+    suspend fun getNotesFromDB(user: User?): List<Note>?
 
-    fun updateNoteInDB(note: Note, callback: (Note?) -> Unit)
+    suspend fun updateNoteInDB(
+        note: Note,
+        user: User? = null,
+        timeStamp: Date? = null,
+        onlineMode: Boolean = true
+    ): Note?
 
-    fun deleteNoteFromDB(note: Note, callback: (Note?) -> Unit)
+    suspend fun deleteNoteFromDB(
+        note: Note,
+        user: User? = null,
+        timeStamp: Date? = null,
+        onlineMode: Boolean = true
+    ): Note?
 }

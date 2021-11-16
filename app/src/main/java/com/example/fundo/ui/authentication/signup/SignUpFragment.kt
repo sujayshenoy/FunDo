@@ -12,7 +12,7 @@ import com.example.fundo.data.wrappers.User
 import com.example.fundo.common.Utilities
 import com.example.fundo.common.Validators
 
-class SignUpFragment:Fragment(R.layout.fragment_signup) {
+class SignUpFragment : Fragment(R.layout.fragment_signup) {
     private lateinit var authenticationSharedViewModel: AuthenticationSharedViewModel
     private lateinit var signUpViewModel: SignUpViewModel
 
@@ -23,7 +23,8 @@ class SignUpFragment:Fragment(R.layout.fragment_signup) {
         dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_loading)
 
-        authenticationSharedViewModel = ViewModelProvider(requireActivity())[AuthenticationSharedViewModel::class.java]
+        authenticationSharedViewModel =
+            ViewModelProvider(requireActivity())[AuthenticationSharedViewModel::class.java]
         signUpViewModel = ViewModelProvider(this@SignUpFragment)[SignUpViewModel::class.java]
 
         attachListeners()
@@ -31,23 +32,22 @@ class SignUpFragment:Fragment(R.layout.fragment_signup) {
     }
 
     private fun attachObservers() {
-        signUpViewModel.emailPassSignUpStatus.observe(viewLifecycleOwner){
-            if(it){
+        signUpViewModel.emailPassSignUpStatus.observe(viewLifecycleOwner) {
+            if (it) {
                 authenticationSharedViewModel.setGoToHome(true)
-            }
-            else{
-                Utilities.displayToast(requireContext(),getString(R.string.user_not_registered))
+            } else {
+                Utilities.displayToast(requireContext(), getString(R.string.user_not_registered))
             }
             dialog.dismiss()
         }
     }
 
     private fun attachListeners() {
-        binding.regLogChangeRText.setOnClickListener{
+        binding.regLogChangeRText.setOnClickListener {
             authenticationSharedViewModel.setGoToLoginScreenStatus(true)
         }
 
-        binding.signUpButton.setOnClickListener{
+        binding.signUpButton.setOnClickListener {
             register()
         }
     }
@@ -60,18 +60,29 @@ class SignUpFragment:Fragment(R.layout.fragment_signup) {
         var phone = binding.phoneTextEdit
         var password = binding.passwordTextEdit
         var confirmPassword = binding.confirmPasswordTextEdit
-        val user = User(name.text.toString(),email.text.toString(),phone.text.toString())
+        val user = User(name.text.toString(), email.text.toString(), phone.text.toString())
 
-        if(Validators.signUpValidator(requireContext(),name,email,phone,password,confirmPassword)){
-            signUpViewModel.signUpWithEmailAndPassword(user,password.text.toString())
-        }
-        else{
+        if (Validators.signUpValidator(
+                requireContext(),
+                name,
+                email,
+                phone,
+                password,
+                confirmPassword
+            )
+        ) {
+            signUpViewModel.signUpWithEmailAndPassword(
+                requireContext(),
+                user,
+                password.text.toString()
+            )
+        } else {
             dialog.dismiss()
         }
     }
 
-    companion object{
-        lateinit var binding : FragmentSignupBinding
-        lateinit var dialog : Dialog
+    companion object {
+        lateinit var binding: FragmentSignupBinding
+        lateinit var dialog: Dialog
     }
 }

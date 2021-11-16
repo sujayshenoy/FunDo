@@ -8,51 +8,36 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context=".ui.home.HomeActivity">
 
-        <RelativeLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/toolBarLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".ui.home.HomeActivity">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/border_toolbar"
+            app:elevation="0dp">
 
-            <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/toolBarLayout"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/border_toolbar"
-                app:elevation="0dp">
+                app:navigationIcon="@drawable/button_drawer_toggle"
+                app:title="@string/app_name" />
+        </com.google.android.material.appbar.AppBarLayout>
 
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:navigationIcon="@drawable/button_drawer_toggle"
-                    app:title="@string/app_name" />
-            </com.google.android.material.appbar.AppBarLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/notesRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/toolBarLayout"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="10dp" />
-        </RelativeLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/addNewNoteFab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="30dp"
-            android:elevation="10dp"
-            android:src="@drawable/button_fab_add" />
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/homeActivityFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolBarLayout"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"/>
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView

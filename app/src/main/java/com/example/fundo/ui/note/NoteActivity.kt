@@ -8,7 +8,7 @@ import com.example.fundo.databinding.ActivityNoteBinding
 
 class NoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteBinding
-    private lateinit var id: String
+    private var id: Long? = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,11 +22,11 @@ class NoteActivity : AppCompatActivity() {
 
     private fun loadDataFromIntent() {
         val intent = intent
-        id = intent.extras?.getString("id").toString()
+        id = intent.extras?.getLong("id")
         val title = intent.extras?.getString("title")
         val content = intent.extras?.getString("content")
 
-        if(title != null || content != null){
+        if (title != null || content != null) {
             binding.titleTextEdit.setText(title)
             binding.contentTextEdit.setText(content)
             binding.deleteButton.visibility = View.VISIBLE
@@ -34,33 +34,33 @@ class NoteActivity : AppCompatActivity() {
     }
 
     private fun attachListeners() {
-        binding.saveNoteFab.setOnClickListener{
+        binding.saveNoteFab.setOnClickListener {
             val title = binding.titleTextEdit.text.toString()
             val content = binding.contentTextEdit.text.toString()
 
             val intent = Intent()
-            intent.putExtra("id",id)
-            intent.putExtra("title",title)
-            intent.putExtra("content",content)
+            intent.putExtra("id", id)
+            intent.putExtra("title", title)
+            intent.putExtra("content", content)
 
-            setResult(RESULT_OK,intent)
+            setResult(RESULT_OK, intent)
             finish()
         }
 
-        binding.backButton.setOnClickListener{
+        binding.backButton.setOnClickListener {
             finish()
         }
 
-        binding.deleteButton.setOnClickListener{
+        binding.deleteButton.setOnClickListener {
             val intent = Intent()
-            intent.putExtra("id",id)
+            intent.putExtra("id", id)
 
-            setResult(DELETE_NOTE,intent)
+            setResult(DELETE_NOTE, intent)
             finish()
         }
     }
 
-    companion object{
+    companion object {
         const val DELETE_NOTE = 0
     }
 }
