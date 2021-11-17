@@ -8,22 +8,25 @@ import com.example.fundo.data.wrappers.Note
 import com.example.fundo.common.Logger
 import com.example.fundo.data.room.DateTypeConverters
 import com.example.fundo.interfaces.DatabaseInterface
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.coroutines.suspendCoroutine
 
-object FirebaseDatabaseService : DatabaseInterface {
-    private val database = Firebase.database.reference
+class FirebaseDatabaseService : DatabaseInterface {
+    private val fireStore = Firebase.firestore
+
+    companion object {
+        private val instance: FirebaseDatabaseService? = null
+        fun getInstance(): FirebaseDatabaseService = instance ?: FirebaseDatabaseService()
+    }
+
     override suspend fun addUserToDB(user: User): User? {
         val userDB = CloudDBUser(user.name, user.email, user.phone)
         return suspendCoroutine {
-            database.child("users").child(user.firebaseId)
-                .setValue(userDB).addOnCompleteListener { task ->
+            fireStore.collection("users").document(user.firebaseId)
+                .set(userDB).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         it.resumeWith(Result.success(user))
                     } else {
@@ -34,41 +37,31 @@ object FirebaseDatabaseService : DatabaseInterface {
         }
     }
 
-    suspend fun checkUserInDB(firebaseUserId: String): Boolean {
-        return suspendCoroutine {
-            database.child("users").addListenerForSingleValueEvent(
-                object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.hasChild(firebaseUserId)) {
-                            it.resumeWith(Result.success(true))
-                        } else {
-                            it.resumeWith(Result.success(false))
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        it.resumeWith(Result.failure(error.toException()))
-                    }
-                })
-        }
-    }
-
     override suspend fun getUserFromDB(userID: Long): User? {
         return null
     }
 
     suspend fun getUserFromDB(userID: String): User? {
         return suspendCoroutine {
-            database.child("users").child(userID)
+            fireStore.collection("users").document(userID)
                 .get().addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         task.result.also { snapshot ->
                             Logger.logDbInfo("User from DB $snapshot")
-                            val userDb =
-                                Utilities.createUserFromHashMap(snapshot?.value as HashMap<*, *>)
-                            val user =
-                                User(userDb.name, userDb.email, userDb.phone, firebaseId = userID)
-                            it.resumeWith(Result.success(user))
+                            if (snapshot != null) {
+                                val userDb =
+                                    Utilities.createUserFromHashMap(snapshot.data as HashMap<*, *>)
+                                val user =
+                                    User(
+                                        userDb.name,
+                                        userDb.email,
+                                        userDb.phone,
+                                        firebaseId = userID
+                                    )
+                                it.resumeWith(Result.success(user))
+                            } else {
+                                it.resumeWith(Result.success(null))
+                            }
                         }
                     } else {
                         Logger.logDbError("RealtimeDB:Read Failed")
@@ -90,12 +83,12 @@ object FirebaseDatabaseService : DatabaseInterface {
             DateTypeConverters().fromDateTime(timeStamp).toString()
         )
         return suspendCoroutine {
-            val ref = database.child("users").child(user?.firebaseId!!)
-                .child("notes").push()
-            ref.setValue(dbNote)
+            val ref = fireStore.collection("users").document(user?.firebaseId!!)
+                .collection("notes")
+            ref.add(dbNote)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        note.firebaseId = ref.key.toString()
+                        note.firebaseId = ref.id
                         it.resumeWith(Result.success(note))
                     } else {
                         Logger.logDbError("RealTimeDB: Write Failed")
@@ -108,16 +101,16 @@ object FirebaseDatabaseService : DatabaseInterface {
     override suspend fun getNotesFromDB(user: User?): List<Note>? {
         val notes = mutableListOf<Note>()
         return suspendCoroutine {
-            database.child("users").child(user?.firebaseId!!)
-                .child("notes").get().addOnCompleteListener { task ->
+            fireStore.collection("users").document(user?.firebaseId!!)
+                .collection("notes").get().addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        for (i in task.result?.children!!) {
-                            val noteHashMap = i.value as HashMap<String, String>
+                        for (i in task.result?.documents!!) {
+                            val noteHashMap = i.data as HashMap<*, *>
                             val note = Note(
                                 noteHashMap["title"].toString(),
                                 noteHashMap["content"].toString(),
-                                firebaseId = i.key.toString(),
-                                lastModified = DateTypeConverters().toDateTime(noteHashMap["lastModified"]) as Date
+                                firebaseId = i.id,
+                                lastModified = DateTypeConverters().toDateTime(noteHashMap["lastModified"].toString()) as Date
                             )
                             notes.add(note)
                         }
@@ -143,8 +136,8 @@ object FirebaseDatabaseService : DatabaseInterface {
         )
 
         return suspendCoroutine {
-            database.child("users").child(user?.firebaseId!!)
-                .child("notes").child(note.firebaseId).updateChildren(noteMap)
+            fireStore.collection("users").document(user?.firebaseId!!)
+                .collection("notes").document(note.firebaseId).update(noteMap)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         it.resumeWith(Result.success(note))
@@ -163,8 +156,8 @@ object FirebaseDatabaseService : DatabaseInterface {
         onlineMode: Boolean
     ): Note? {
         return suspendCoroutine {
-            database.child("users").child(user?.firebaseId!!)
-                .child("notes").child(note.firebaseId).removeValue()
+            fireStore.collection("users").document(user?.firebaseId!!)
+                .collection("notes").document(note.firebaseId).delete()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         it.resumeWith(Result.success(note))

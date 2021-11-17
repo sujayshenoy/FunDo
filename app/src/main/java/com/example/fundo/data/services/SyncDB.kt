@@ -40,7 +40,7 @@ class SyncDB(private val context: Context) {
                             val res = compareTimeStamp(localNote, cloudNote)
                             if (res) {
                                 latestNotes.add(localNote)
-                                FirebaseDatabaseService.updateNoteInDB(
+                                FirebaseDatabaseService.getInstance().updateNoteInDB(
                                     localNote,
                                     user,
                                     localNote.lastModified
@@ -63,7 +63,7 @@ class SyncDB(private val context: Context) {
                     for (cloudNote in cloudNotesList) {
                         if (localNote.firebaseId == cloudNote.firebaseId) {
                             if (getOpCode(localNote) == DELETE_OP_CODE) {
-                                FirebaseDatabaseService.deleteNoteFromDB(
+                                FirebaseDatabaseService.getInstance().deleteNoteFromDB(
                                     localNote,
                                     user,
                                     Date(System.currentTimeMillis())
@@ -78,7 +78,7 @@ class SyncDB(private val context: Context) {
                         val opCode = getOpCode(localNote)
                         if (opCode != -1) {
                             latestNotes.add(localNote)
-                            FirebaseDatabaseService.addNoteToDB(
+                            FirebaseDatabaseService.getInstance().addNoteToDB(
                                 localNote,
                                 user,
                                 localNote.lastModified

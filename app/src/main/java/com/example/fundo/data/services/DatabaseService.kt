@@ -12,6 +12,8 @@ import java.util.*
 
 class DatabaseService(private val context: Context) : DatabaseInterface {    //to singleton
     private val sqLiteDatabaseService: SqLiteDatabaseService = SqLiteDatabaseService(context)
+    private val firebaseDatabaseService = FirebaseDatabaseService.getInstance()
+
 
     companion object {
         private val instance: DatabaseService? by lazy { null }
@@ -21,7 +23,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
 
     suspend fun addCloudDataToLocalDB(user: User): Boolean {
         return withContext(Dispatchers.IO) {
-            val noteListFromCloud = FirebaseDatabaseService.getNotesFromDB(user)
+            val noteListFromCloud = firebaseDatabaseService.getNotesFromDB(user)
             if (noteListFromCloud != null) {
                 for (i in noteListFromCloud) {
                     sqLiteDatabaseService.addNoteToDB(
@@ -37,7 +39,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
     override suspend fun addUserToDB(user: User): User? {
         return try {
             return withContext(Dispatchers.IO) {
-                val newUser = FirebaseDatabaseService.getUserFromDB(user.firebaseId)!!
+                val newUser = firebaseDatabaseService.getUserFromDB(user.firebaseId)!!
                 return@withContext sqLiteDatabaseService.addUserToDB(newUser)
             }
         } catch (ex: FirebaseException) {
@@ -49,7 +51,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
     suspend fun addUserToCloudDB(user: User): User? {
         return try {
             return withContext(Dispatchers.IO) {
-                return@withContext FirebaseDatabaseService.addUserToDB(user)
+                return@withContext firebaseDatabaseService.addUserToDB(user)
             }
         } catch (ex: FirebaseException) {
             ex.printStackTrace()
@@ -60,7 +62,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
     suspend fun checkUserInCloudDB(userId: String): Boolean {
         return try {
             return withContext(Dispatchers.IO) {
-                return@withContext FirebaseDatabaseService.checkUserInDB(userId)
+                return@withContext firebaseDatabaseService.getUserFromDB(userId) != null
             }
         } catch (ex: FirebaseException) {
             ex.printStackTrace()
@@ -100,7 +102,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
             return withContext(Dispatchers.IO) {
                 val now = Date(System.currentTimeMillis())
                 if (NetworkService.isNetworkConnected(context)) {
-                    val newNote = FirebaseDatabaseService.addNoteToDB(
+                    val newNote = firebaseDatabaseService.addNoteToDB(
                         note,
                         user,
                         timeStamp = now
@@ -137,7 +139,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
     suspend fun getNotesFromCloud(user: User?): List<Note>? {
         return try {
             return withContext(Dispatchers.IO) {
-                return@withContext FirebaseDatabaseService.getNotesFromDB(user)
+                return@withContext firebaseDatabaseService.getNotesFromDB(user)
             }
         } catch (ex: FirebaseException) {
             ex.printStackTrace()
@@ -155,7 +157,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
             return withContext(Dispatchers.IO) {
                 val now = Date(System.currentTimeMillis())
                 if (NetworkService.isNetworkConnected(context)) {
-                    val updatedNote = FirebaseDatabaseService.updateNoteInDB(
+                    val updatedNote = firebaseDatabaseService.updateNoteInDB(
                         note,
                         user,
                         timeStamp = now
@@ -188,7 +190,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
             return withContext(Dispatchers.IO) {
                 val now = Date(System.currentTimeMillis())
                 if (NetworkService.isNetworkConnected(context)) {
-                    val deletedNote = FirebaseDatabaseService.deleteNoteFromDB(
+                    val deletedNote = firebaseDatabaseService.deleteNoteFromDB(
                         note,
                         user,
                         timeStamp = now
