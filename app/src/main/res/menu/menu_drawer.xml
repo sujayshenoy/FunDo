@@ -4,8 +4,7 @@
     tools:showIn="navigation_view"
     >
 
-    <group android:id="@+id/mainContent"
-        android:checkableBehavior="single">
+    <group android:id="@+id/mainContent">
         <item
             android:id="@+id/notes"
             android:title="@string/nav_drawer_notes"
@@ -19,8 +18,7 @@
         </item>
     </group>
 
-    <group android:id="@+id/misc"
-        android:checkableBehavior="single">
+    <group android:id="@+id/misc">
         <item
             android:id="@+id/settings"
             android:title="@string/nav_drawer_settings"

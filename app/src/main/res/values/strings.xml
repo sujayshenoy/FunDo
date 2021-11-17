@@ -45,4 +45,5 @@
     <string name="user_not_registered">User not registered</string>
     <string name="empty_note_discarded">Empty Note Discarded</string>
     <string name="storage_denied_permission_error">Storage Access required to upload picture</string>
+    <string name="no_internet_error">No internet connection available</string>
 </resources>

@@ -19,6 +19,7 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.common.Logger
@@ -122,9 +123,12 @@ class HomeActivity : AppCompatActivity() {
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.isDrawerIndicatorEnabled = true
         toggle.syncState()
-        binding.navigationDrawer.setCheckedItem(R.id.notes)
+
+        val notesItemMenu = binding.navigationDrawer.menu[0]
+        notesItemMenu.isChecked = true
 
         binding.navigationDrawer.setNavigationItemSelectedListener {
+            notesItemMenu.isChecked = false
             when (it.itemId) {
                 R.id.notes -> homeViewModel.goToNotesListFragment()
                 R.id.reminders -> Utilities.displayToast(this@HomeActivity, "Reminders Selected")
@@ -133,7 +137,7 @@ class HomeActivity : AppCompatActivity() {
                 R.id.logout -> homeViewModel.logout(this@HomeActivity)
             }
 
-            it.isChecked = true
+            it.isCheckable = true
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
