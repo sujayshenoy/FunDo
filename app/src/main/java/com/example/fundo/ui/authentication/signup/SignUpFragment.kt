@@ -30,7 +30,7 @@ class SignUpFragment : Fragment(R.layout.fragment_signup) {
         attachListeners()
         attachObservers()
     }
-
+    
     private fun attachObservers() {
         signUpViewModel.emailPassSignUpStatus.observe(viewLifecycleOwner) {
             if (it) {

@@ -2,13 +2,16 @@ package com.example.fundo.data.services
 
 import android.content.Context
 import com.example.fundo.common.NetworkService
+import com.example.fundo.data.wrappers.Label
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.interfaces.DatabaseInterface
 import com.google.firebase.FirebaseException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 import java.util.*
+import kotlin.collections.ArrayList
 
 class DatabaseService(private val context: Context) : DatabaseInterface {    //to singleton
     private val sqLiteDatabaseService: SqLiteDatabaseService = SqLiteDatabaseService(context)
@@ -210,6 +213,54 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
         } catch (ex: FirebaseException) {
             ex.printStackTrace()
             null
+        }
+    }
+
+    suspend fun addLabelToDB(label: Label, user: User?, timeStamp: Date? = null): Label? {
+        val now = Date(System.currentTimeMillis())
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext firebaseDatabaseService.addLabelToDB(label, user, now)
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun deleteLabelFromDB(label: Label, user: User?): Label? {
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext firebaseDatabaseService.deleteLabelFromDB(label, user)
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun updateLabel(label: Label, user: User?): Label? {
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext firebaseDatabaseService.updateLabel(
+                    label, user,
+                    Date(System.currentTimeMillis())
+                )
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun getLabels(user: User?): ArrayList<Label> {
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext firebaseDatabaseService.getLabels(user)
+            }
+        } catch (ex: FirebaseException) {
+            ex.printStackTrace()
+            ArrayList()
         }
     }
 

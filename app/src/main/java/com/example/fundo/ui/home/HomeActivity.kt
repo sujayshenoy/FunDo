@@ -26,9 +26,13 @@ import com.example.fundo.common.Logger
 import com.example.fundo.databinding.ActivityHomeBinding
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.common.Utilities
+import com.example.fundo.config.Constants.ADD_NEW_LABEL_REQUEST_CODE
 import com.example.fundo.config.Constants.PICK_IMAGE_FOR_USERPROFILE_REQUEST_CODE
 import com.example.fundo.config.Constants.STORAGE_PERMISSION_REQUEST_CODE
+import com.example.fundo.data.services.DatabaseService
+import com.example.fundo.data.wrappers.Label
 import com.example.fundo.data.wrappers.User
+import com.example.fundo.ui.home.label.LabelActivity
 import com.example.fundo.ui.home.noteslist.NotesListFragment
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.*
@@ -42,6 +46,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var profileOverlayView: View
     private var menu: Menu? = null
     private var currentUser: User = User(name = "Name", email = "email", phone = "phone")
+    private lateinit var labelsList: ArrayList<Label>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +85,11 @@ class HomeActivity : AppCompatActivity() {
         if (requestCode == PICK_IMAGE_FOR_USERPROFILE_REQUEST_CODE && data != null) {
             handleUserImagePickData(data.data)
         }
+
+        if (requestCode == ADD_NEW_LABEL_REQUEST_CODE && data != null) {
+            labelsList = data.extras?.getSerializable("labelList") as ArrayList<Label>
+            loadLabelsIntoDrawer()
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -109,6 +119,13 @@ class HomeActivity : AppCompatActivity() {
                 NotesListFragment()
             )
         }
+
+        homeViewModel.goToCreateNewLabel.observe(this@HomeActivity) {
+            val intent = Intent(this@HomeActivity, LabelActivity::class.java)
+            intent.putExtra("labelList", labelsList)
+            intent.putExtra("currentUser", currentUser)
+            startActivityForResult(intent, ADD_NEW_LABEL_REQUEST_CODE)
+        }
     }
 
     private fun createNavigationDrawer() {
@@ -137,7 +154,9 @@ class HomeActivity : AppCompatActivity() {
                 R.id.logout -> homeViewModel.logout(this@HomeActivity)
             }
 
-            it.isCheckable = true
+            if (it.itemId != R.id.newLabelButton) {
+                it.isCheckable = true
+            }
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
@@ -161,7 +180,13 @@ class HomeActivity : AppCompatActivity() {
 
         homeViewModel.getUserFromDB.observe(this@HomeActivity) {
             currentUser = it
+            homeViewModel.getLabelFromDB(this@HomeActivity, it)
             setUserData()
+        }
+
+        homeViewModel.getLabelFromDB.observe(this@HomeActivity) {
+            labelsList = it
+            loadLabelsIntoDrawer()
         }
 
         homeViewModel.logoutStatus.observe(this@HomeActivity) {
@@ -182,6 +207,21 @@ class HomeActivity : AppCompatActivity() {
 
             dialog.dismiss()
         }
+    }
+
+    private fun loadLabelsIntoDrawer() {
+        val navMenu = binding.navigationDrawer.menu
+        navMenu.removeGroup(R.id.labels)
+        val subMenu = navMenu.addSubMenu(R.id.labels, Menu.NONE, 2, "Labels")
+        labelsList.forEachIndexed { index, label ->
+            subMenu.add(0, Menu.NONE, index, label.name)
+                .setIcon(R.drawable.icon_label)
+        }
+        subMenu.add(0, Menu.NONE, labelsList.size, "Create New Label")
+            .setIcon(R.drawable.button_add).setOnMenuItemClickListener {
+                homeViewModel.goToCreateNewLabel()
+                true
+            }
     }
 
     private fun createProfileOverlay() {

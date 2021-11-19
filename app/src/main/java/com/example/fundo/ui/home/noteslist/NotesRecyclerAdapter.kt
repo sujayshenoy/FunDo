@@ -17,7 +17,7 @@ class NotesRecyclerAdapter(private val notesList: ArrayList<Note>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
         val itemView =
-            LayoutInflater.from(parent.context).inflate(R.layout.recycler_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.item_recyclernotes, parent, false)
         return NotesViewHolder(itemView, recyclerListener)
     }
 
@@ -69,8 +69,8 @@ class NotesRecyclerAdapter(private val notesList: ArrayList<Note>) :
                     notesList
                 } else {
                     val filteredList = arrayListOf<Note>()
-                    for(i in tempList){
-                        if(i.title.contains(p0,true) || i.content.contains(p0,true)){
+                    for (i in tempList) {
+                        if (i.title.contains(p0, true) || i.content.contains(p0, true)) {
                             filteredList.add(i)
                         }
                     }
@@ -88,6 +88,4 @@ class NotesRecyclerAdapter(private val notesList: ArrayList<Note>) :
             }
         }
     }
-
-
 }

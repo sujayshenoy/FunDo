@@ -6,10 +6,13 @@ import com.example.fundo.data.wrappers.User
 import com.example.fundo.common.Utilities
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.common.Logger
+import com.example.fundo.data.models.CloudDBLabel
 import com.example.fundo.data.room.DateTypeConverters
+import com.example.fundo.data.wrappers.Label
 import com.example.fundo.interfaces.DatabaseInterface
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.coroutines.suspendCoroutine
@@ -71,6 +74,7 @@ class FirebaseDatabaseService : DatabaseInterface {
         }
     }
 
+
     override suspend fun addNoteToDB(
         note: Note,
         user: User?,
@@ -83,12 +87,13 @@ class FirebaseDatabaseService : DatabaseInterface {
             DateTypeConverters().fromDateTime(timeStamp).toString()
         )
         return suspendCoroutine {
-            val ref = fireStore.collection("users").document(user?.firebaseId!!)
-                .collection("notes")
-            ref.add(dbNote)
+            val id = fireStore.collection("users").document(user?.firebaseId!!)
+                .collection("notes").document().id
+            fireStore.collection("users").document(user.firebaseId)
+                .collection("notes").document(id).set(dbNote)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        note.firebaseId = ref.id
+                        note.firebaseId = id
                         it.resumeWith(Result.success(note))
                     } else {
                         Logger.logDbError("RealTimeDB: Write Failed")
@@ -166,6 +171,88 @@ class FirebaseDatabaseService : DatabaseInterface {
                         it.resumeWith(Result.failure(task.exception!!))
                     }
                 }
+        }
+    }
+
+    suspend fun addLabelToDB(label: Label, user: User?, timeStamp: Date?): Label? {
+        val dbLabel =
+            CloudDBLabel(label.name, DateTypeConverters().fromDateTime(timeStamp).toString())
+        return suspendCoroutine {
+            val id = fireStore.collection("users").document(user?.firebaseId!!)
+                .collection("labels").document().id
+            fireStore.collection("users").document(user.firebaseId)
+                .collection("labels").document(id).set(dbLabel).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        label.firebaseId = id
+                        it.resumeWith(Result.success(label))
+                    } else {
+                        Logger.logDbError("RealTimeDB: Write Failed")
+                        it.resumeWith(Result.failure(task.exception!!))
+                    }
+                }
+        }
+    }
+
+    suspend fun deleteLabelFromDB(label: Label, user: User?): Label? {
+        return suspendCoroutine {
+            fireStore.collection("users").document(user?.firebaseId!!)
+                .collection("labels").document(label.firebaseId).delete()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        it.resumeWith(Result.success(label))
+                    } else {
+                        Logger.logDbError("RealTimeDB: Write Failed")
+                        it.resumeWith(Result.failure(task.exception!!))
+                    }
+                }
+        }
+    }
+
+    suspend fun getLabels(user: User?): ArrayList<Label> {
+        val labels = ArrayList<Label>()
+        return suspendCoroutine {
+            if (user != null) {
+                fireStore.collection("users").document(user.firebaseId)
+                    .collection("labels").get()
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            for (i in task.result?.documents!!) {
+                                val labelHashMap = i.data as HashMap<*, *>
+                                val label = Label(
+                                    name = labelHashMap["name"].toString(),
+                                    lastModified = DateTypeConverters().toDateTime(labelHashMap["lastModified"].toString()) as Date,
+                                    firebaseId = i.id
+                                )
+                                labels.add(label)
+                            }
+                            it.resumeWith(Result.success(labels))
+                        } else {
+                            Logger.logDbError("RealTimeDB: Read Failed")
+                            it.resumeWith(Result.failure(task.exception!!))
+                        }
+                    }
+            }
+        }
+    }
+
+    suspend fun updateLabel(label: Label, user: User?, timeStamp: Date?): Label? {
+        val dbLabel = mapOf(
+            "name" to label.name,
+            "lastModified" to DateTypeConverters().fromDateTime(timeStamp).toString()
+        )
+        return suspendCoroutine {
+            user?.firebaseId?.let { id ->
+                fireStore.collection("users").document(id)
+                    .collection("labels").document(label.firebaseId)
+                    .update(dbLabel).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            it.resumeWith(Result.success(label))
+                        } else {
+                            Logger.logDbError("RealTimeDB : Read Failed")
+                            it.resumeWith(Result.failure(task.exception!!))
+                        }
+                    }
+            }
         }
     }
 }

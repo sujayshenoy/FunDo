@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="16dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/button_arrow_left"
+        android:layout_alignParentStart="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/labels_title"
+        android:textSize="18sp"
+        android:layout_toEndOf="@id/backButton"
+        android:layout_marginStart="8dp"
+        />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/backButton"
+        android:layout_marginTop="16dp"
+        android:id="@+id/newLabelLayout">
+
+        <ImageView
+            android:id="@+id/addNewLabelButton"
+            android:tag="add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/button_add" />
+
+        <EditText
+            android:id="@+id/newLabelTextEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:hint="@string/create_new_label_textedit"
+            android:textSize="18sp"
+            android:layout_centerInParent="true"
+            android:layout_toEndOf="@id/addNewLabelButton"
+            android:layout_toStartOf="@id/saveNewLabelButton"/>
+
+        <ImageView
+            android:id="@+id/saveNewLabelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/button_check"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/labelRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/newLabelLayout"
+        android:layout_marginTop="8dp" />
+</RelativeLayout>
