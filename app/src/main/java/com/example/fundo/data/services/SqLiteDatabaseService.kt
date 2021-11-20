@@ -59,7 +59,8 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
                 fid = note.firebaseId,
                 title = note.title,
                 content = note.content,
-                lastModified = timeStamp!!
+                lastModified = timeStamp!!,
+                archived = note.archived
             )
             note.id = noteDao.addNote(noteEntity)
             if (!onlineMode) {
@@ -77,13 +78,31 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
             for (i in noteEntityList) {
                 val note = Note(
                     title = i.title, content = i.content, id = i.nid,
-                    firebaseId = i.fid, lastModified = i.lastModified
+                    firebaseId = i.fid, lastModified = i.lastModified,
+                    archived = i.archived
                 )
                 noteList.add(note)
             }
             noteList
         }
     }
+
+    suspend fun getArchivedNotes(user: User?): List<Note> {
+        return withContext(Dispatchers.IO) {
+            val noteEntityList = noteDao.getArchives()
+            val noteList = mutableListOf<Note>()
+            for (i in noteEntityList) {
+                val note = Note(
+                    title = i.title, content = i.content, id = i.nid,
+                    firebaseId = i.fid, lastModified = i.lastModified,
+                    archived = i.archived
+                )
+                noteList.add(note)
+            }
+            noteList
+        }
+    }
+
 
     override suspend fun updateNoteInDB(
         note: Note,
@@ -97,7 +116,8 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
                 note.firebaseId,
                 note.title,
                 note.content,
-                lastModified = timeStamp!!
+                lastModified = timeStamp!!,
+                archived = note.archived
             )
             Logger.logInfo("NoteEntity: $noteEntity")
             noteDao.updateNote(noteEntity)

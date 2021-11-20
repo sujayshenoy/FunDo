@@ -135,7 +135,18 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
             }
         } catch (ex: FirebaseException) {
             ex.printStackTrace()
-            null
+            listOf()
+        }
+    }
+
+    suspend fun getArchivedNotes(user: User?): List<Note> {
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext sqLiteDatabaseService.getArchivedNotes(user)
+            }
+        } catch (ex: FirebaseException) {
+            ex.printStackTrace()
+            listOf()
         }
     }
 

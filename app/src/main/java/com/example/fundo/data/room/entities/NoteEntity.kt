@@ -12,4 +12,5 @@ data class NoteEntity(
     val title: String,
     val content: String,
     val lastModified: Date,
+    val archived: Boolean = false
 )

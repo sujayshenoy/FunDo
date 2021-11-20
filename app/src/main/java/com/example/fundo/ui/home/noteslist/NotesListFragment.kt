@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.fundo.R
+import com.example.fundo.common.Logger
 import com.example.fundo.common.Utilities
 import com.example.fundo.config.Constants
 import com.example.fundo.data.wrappers.Note
@@ -20,7 +21,8 @@ import com.example.fundo.databinding.FragmentNoteListBinding
 import com.example.fundo.ui.home.HomeViewModel
 import com.example.fundo.ui.note.NoteActivity
 
-class NotesListFragment : Fragment(R.layout.fragment_note_list) {
+class NotesListFragment(private val archive: Boolean = false) :
+    Fragment(R.layout.fragment_note_list) {
     private lateinit var binding: FragmentNoteListBinding
     private lateinit var notesListViewModel: NotesListViewModel
     private lateinit var homeViewModel: HomeViewModel
@@ -82,21 +84,34 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
             notesAdapter.notifyDataSetChanged()
         }
 
+        notesListViewModel.getArchivedNotesFromDB.observe(viewLifecycleOwner) {
+            noteList.clear()
+            noteList.addAll(it)
+            notesAdapter.notifyDataSetChanged()
+        }
+
         notesListViewModel.addNoteToDB.observe(viewLifecycleOwner) {
             noteList.add(it)
             notesAdapter.notifyItemInserted(noteList.size)
         }
 
-        notesListViewModel.updateNoteInDB.observe(viewLifecycleOwner) {
-            var pos: Int = -1
-            noteList.map { note ->
-                if (note.id == it.id) {
-                    note.title = it.title
-                    note.content = it.content
-                    pos = noteList.indexOf(note)
-                }
+        notesListViewModel.updateNoteInDB.observe(viewLifecycleOwner) { note ->
+            val targetNote = noteList.first { it.id == note.id }
+            val index = noteList.indexOf(targetNote)
+            targetNote.title = note.title
+            targetNote.content = note.content
+            targetNote.archived = note.archived
+            notesAdapter.notifyItemChanged(index)
+
+            if (archive && !targetNote.archived) {
+                notesAdapter.notifyItemRemoved(index)
+                noteList.removeAt(index)
+                Utilities.displayToast(requireContext(), "Note Unarchived")
+            } else if (!archive && targetNote.archived) {
+                notesAdapter.notifyItemRemoved(index)
+                noteList.removeAt(index)
+                Utilities.displayToast(requireContext(), "Note Archived")
             }
-            notesAdapter.notifyItemChanged(pos)
         }
 
         notesListViewModel.deleteNoteFromDB.observe(viewLifecycleOwner) {
@@ -112,7 +127,11 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
 
         homeViewModel.getUserFromDB.observe(viewLifecycleOwner) {
             currentUser = it
-            notesListViewModel.getNotesFromDB(requireContext(), currentUser)
+            if (archive) {
+                notesListViewModel.getArchivedNotes(requireContext(), currentUser)
+            } else {
+                notesListViewModel.getNotesFromDB(requireContext(), currentUser)
+            }
         }
     }
 
@@ -128,6 +147,9 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
     }
 
     private fun initNotesRecyclerView() {
+        if (archive) {
+            binding.addNewNoteFab.visibility = View.GONE
+        }
         notesAdapter = NotesRecyclerAdapter(noteList as ArrayList<Note>)
         val notesRecyclerView = binding.notesRecyclerView
         notesRecyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
@@ -139,6 +161,7 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
                 intent.putExtra("id", note.id)
                 intent.putExtra("title", note.title)
                 intent.putExtra("content", note.content)
+                intent.putExtra("archived", note.archived)
                 startActivityForResult(intent, Constants.UPDATE_NOTE_REQUEST_CODE)
             }
         })
@@ -185,10 +208,12 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
         val id = noteBundle?.getLong("id")
         val title = noteBundle?.getString("title").toString()
         val content = noteBundle?.getString("content").toString()
+        val archived = noteBundle?.getBoolean("archived") ?: false
 
         if (title.isNotEmpty() || content.isNotEmpty()) {
             val updateNote = noteList.find { it.id == id }!!
-            val note = Note(title, content, updateNote.id, updateNote.firebaseId)
+            val note =
+                Note(title, content, updateNote.id, updateNote.firebaseId, archived = archived)
             notesListViewModel.updateNoteInDB(requireContext(), note, currentUser)
         } else {
             handleDeleteNote(noteBundle)

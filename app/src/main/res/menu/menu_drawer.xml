@@ -13,6 +13,12 @@
         </item>
 
         <item
+            android:id="@+id/archive"
+            android:title="Archived"
+            android:icon="@drawable/button_archive">
+        </item>
+
+        <item
             android:id="@+id/reminders"
             android:title="@string/nav_drawer_reminders"
             android:icon="@drawable/icon_reminder">
