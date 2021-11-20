@@ -7,12 +7,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fundo.auth.services.FirebaseAuthService
-import com.example.fundo.common.Logger
 import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.data.services.DatabaseService
 import com.example.fundo.data.services.CloudStorageService
-import com.example.fundo.data.services.SyncDB
-import com.example.fundo.data.wrappers.Note
+import com.example.fundo.data.wrappers.Label
 import com.example.fundo.data.wrappers.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,6 +31,12 @@ class HomeViewModel : ViewModel() {
 
     private val _goToNotesList = MutableLiveData<Boolean>()
     val goToNotesList = _goToNotesList as LiveData<Boolean>
+
+    private val _goToCreateNewLabel = MutableLiveData<Boolean>()
+    val goToCreateNewLabel = _goToCreateNewLabel as LiveData<Boolean>
+
+    private val _getLabelFromDB = MutableLiveData<ArrayList<Label>>()
+    val getLabelFromDB = _getLabelFromDB as LiveData<ArrayList<Label>>
 
     fun goToAuthenticationActivity(status: Boolean) {
         _goToAuthenticationActivity.value = status
@@ -82,5 +86,16 @@ class HomeViewModel : ViewModel() {
                 _getUserFromDB.postValue(user)
             }
         }
+    }
+
+    fun getLabelFromDB(context: Context, user: User) {
+        viewModelScope.launch {
+            val label = DatabaseService.getInstance(context).getLabels(user)
+            _getLabelFromDB.postValue(label)
+        }
+    }
+
+    fun goToCreateNewLabel() {
+        _goToCreateNewLabel.value = true
     }
 }

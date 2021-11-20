@@ -5,7 +5,7 @@
     >
 
     <group android:id="@+id/mainContent"
-        android:checkableBehavior="single">
+        android:orderInCategory="1">
         <item
             android:id="@+id/notes"
             android:title="@string/nav_drawer_notes"
@@ -19,8 +19,17 @@
         </item>
     </group>
 
+    <group android:id="@+id/labels"
+        android:orderInCategory="2">
+        <item
+            android:id="@+id/newLabelButton"
+            android:title="@string/create_new_label"
+            android:icon="@drawable/button_fab_add">
+        </item>
+    </group>
+
     <group android:id="@+id/misc"
-        android:checkableBehavior="single">
+        android:orderInCategory="3">
         <item
             android:id="@+id/settings"
             android:title="@string/nav_drawer_settings"
@@ -32,11 +41,11 @@
             android:title="@string/nav_drawer_about"
             android:icon="@drawable/icon_info">
         </item>
-    </group>
 
-    <item
-        android:id="@+id/logout"
-        android:title="@string/logout_button_text"
-        android:icon="@drawable/button_logout">
-    </item>
+        <item
+            android:id="@+id/logout"
+            android:title="@string/logout_button_text"
+            android:icon="@drawable/button_logout">
+        </item>
+    </group>
 </menu>

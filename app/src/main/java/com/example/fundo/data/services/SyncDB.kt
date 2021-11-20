@@ -1,6 +1,9 @@
 package com.example.fundo.data.services
 
 import android.content.Context
+import com.example.fundo.R
+import com.example.fundo.common.NetworkService
+import com.example.fundo.common.Utilities
 import com.example.fundo.config.Constants.DELETE_OP_CODE
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
@@ -10,20 +13,22 @@ import java.util.*
 
 class SyncDB(private val context: Context) {
     suspend fun syncNow(user: User) {
-        val latestNotes = getLatestNotesFromDB(user)
-        DatabaseService.getInstance(context).clearNoteAndOp()
-        latestNotes.forEach {
-            DatabaseService.getInstance(context).addNoteToLocalDB(it, user)
+        if (NetworkService.isNetworkConnected(context)) {
+            val latestNotes = getLatestNotesFromDB(user)
+            DatabaseService.getInstance(context).clearNoteAndOp()
+            latestNotes.forEach {
+                DatabaseService.getInstance(context).addNoteToLocalDB(it, user)
+            }
+        } else {
+            Utilities.displayToast(context, context.getString(R.string.no_internet_error))
         }
     }
 
     private suspend fun getLatestNotesFromDB(user: User): List<Note> {
         return withContext(Dispatchers.IO) {
-            val sqlNotesList = DatabaseService.getInstance(context).getNotesFromDB(user)
-            val localNotesList = mutableListOf<Note>()
-            if (sqlNotesList != null) {
-                localNotesList.addAll(sqlNotesList)
-            }
+            val localNotesList =
+                DatabaseService.getInstance(context).getNotesFromDB(user)?.toMutableList()
+                    ?: mutableListOf()
             val cloudNotesList = DatabaseService.getInstance(context).getNotesFromCloud(user)
             val latestNotes = mutableListOf<Note>()
 
@@ -35,7 +40,7 @@ class SyncDB(private val context: Context) {
                             val res = compareTimeStamp(localNote, cloudNote)
                             if (res) {
                                 latestNotes.add(localNote)
-                                FirebaseDatabaseService.updateNoteInDB(
+                                FirebaseDatabaseService.getInstance().updateNoteInDB(
                                     localNote,
                                     user,
                                     localNote.lastModified
@@ -58,7 +63,7 @@ class SyncDB(private val context: Context) {
                     for (cloudNote in cloudNotesList) {
                         if (localNote.firebaseId == cloudNote.firebaseId) {
                             if (getOpCode(localNote) == DELETE_OP_CODE) {
-                                FirebaseDatabaseService.deleteNoteFromDB(
+                                FirebaseDatabaseService.getInstance().deleteNoteFromDB(
                                     localNote,
                                     user,
                                     Date(System.currentTimeMillis())
@@ -73,7 +78,7 @@ class SyncDB(private val context: Context) {
                         val opCode = getOpCode(localNote)
                         if (opCode != -1) {
                             latestNotes.add(localNote)
-                            FirebaseDatabaseService.addNoteToDB(
+                            FirebaseDatabaseService.getInstance().addNoteToDB(
                                 localNote,
                                 user,
                                 localNote.lastModified

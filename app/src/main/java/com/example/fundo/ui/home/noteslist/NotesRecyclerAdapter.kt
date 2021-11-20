@@ -3,23 +3,26 @@ package com.example.fundo.ui.home.noteslist
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundo.R
 import com.example.fundo.data.wrappers.Note
 
-class NotesRecyclerAdapter(private val notesList: List<Note>) :
-    RecyclerView.Adapter<NotesRecyclerAdapter.NotesViewHolder>() {
+class NotesRecyclerAdapter(private val notesList: ArrayList<Note>) :
+    RecyclerView.Adapter<NotesRecyclerAdapter.NotesViewHolder>(), Filterable {
     private lateinit var recyclerListener: OnItemClickListener
+    private var tempList = notesList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
         val itemView =
-            LayoutInflater.from(parent.context).inflate(R.layout.recycler_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.item_recyclernotes, parent, false)
         return NotesViewHolder(itemView, recyclerListener)
     }
 
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
-        val currentNote = notesList[position]
+        val currentNote = tempList[position]
         holder.titleText.text = currentNote.title
         holder.contentText.text = currentNote.content
 
@@ -36,7 +39,7 @@ class NotesRecyclerAdapter(private val notesList: List<Note>) :
     }
 
     override fun getItemCount(): Int {
-        return notesList.size
+        return tempList.size
     }
 
     class NotesViewHolder(itemView: View, listener: OnItemClickListener) :
@@ -59,4 +62,30 @@ class NotesRecyclerAdapter(private val notesList: List<Note>) :
         recyclerListener = listener
     }
 
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(p0: CharSequence?): FilterResults {
+                tempList = if (p0?.isNullOrEmpty() == true) {
+                    notesList
+                } else {
+                    val filteredList = arrayListOf<Note>()
+                    for (i in tempList) {
+                        if (i.title.contains(p0, true) || i.content.contains(p0, true)) {
+                            filteredList.add(i)
+                        }
+                    }
+                    filteredList
+                }
+
+                val filteredResult = FilterResults()
+                filteredResult.values = tempList
+                return filteredResult
+            }
+
+            override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
+                tempList = p1?.values as ArrayList<Note>
+                notifyDataSetChanged()
+            }
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.fundo.interfaces
 
+import com.example.fundo.data.wrappers.Label
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
 import java.util.*

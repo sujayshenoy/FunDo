@@ -26,7 +26,6 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
     private lateinit var homeViewModel: HomeViewModel
     private var currentUser: User = User(name = "Name", email = "email", phone = "phone")
     private val noteList = mutableListOf<Note>()
-    private val tempList = mutableListOf<Note>()
     private var layoutFlag = true
     private lateinit var notesAdapter: NotesRecyclerAdapter
 
@@ -80,13 +79,11 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
         notesListViewModel.getNotesFromDB.observe(viewLifecycleOwner) {
             noteList.clear()
             noteList.addAll(it)
-            syncLists()
             notesAdapter.notifyDataSetChanged()
         }
 
         notesListViewModel.addNoteToDB.observe(viewLifecycleOwner) {
             noteList.add(it)
-            syncLists()
             notesAdapter.notifyItemInserted(noteList.size)
         }
 
@@ -99,14 +96,12 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
                     pos = noteList.indexOf(note)
                 }
             }
-            syncLists()
             notesAdapter.notifyItemChanged(pos)
         }
 
         notesListViewModel.deleteNoteFromDB.observe(viewLifecycleOwner) {
             val notePos = noteList.indexOf(it)
             noteList.remove(it)
-            syncLists()
             notesAdapter.notifyItemRemoved(notePos)
         }
 
@@ -132,19 +127,14 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
         }
     }
 
-    private fun syncLists() {
-        tempList.clear()
-        tempList.addAll(noteList)
-    }
-
     private fun initNotesRecyclerView() {
-        notesAdapter = NotesRecyclerAdapter(tempList)
+        notesAdapter = NotesRecyclerAdapter(noteList as ArrayList<Note>)
         val notesRecyclerView = binding.notesRecyclerView
         notesRecyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
         notesRecyclerView.setHasFixedSize(true)
         notesAdapter.setOnItemClickListener(object : NotesRecyclerAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                val note = tempList[position]
+                val note = noteList[position]
                 val intent = Intent(requireContext(), NoteActivity::class.java)
                 intent.putExtra("id", note.id)
                 intent.putExtra("title", note.title)
@@ -163,15 +153,7 @@ class NotesListFragment : Fragment(R.layout.fragment_note_list) {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                tempList.clear()
-                val queryText = newText!!.lowercase()
-                noteList.forEach {
-                    if (it.title.contains(queryText) || it.content.contains(queryText)) {
-                        tempList.add(it)
-                    }
-                }
-                notesAdapter.notifyDataSetChanged()
-
+                notesAdapter.filter.filter(newText)
                 return false
             }
         })
