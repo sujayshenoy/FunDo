@@ -115,7 +115,8 @@ class FirebaseDatabaseService : DatabaseInterface {
                                 noteHashMap["title"].toString(),
                                 noteHashMap["content"].toString(),
                                 firebaseId = i.id,
-                                lastModified = DateTypeConverters().toDateTime(noteHashMap["lastModified"].toString()) as Date
+                                lastModified = DateTypeConverters().toDateTime(noteHashMap["lastModified"].toString()) as Date,
+                                archived = noteHashMap["archived"] as Boolean
                             )
                             notes.add(note)
                         }
@@ -137,7 +138,8 @@ class FirebaseDatabaseService : DatabaseInterface {
         val noteMap = mapOf(
             "title" to note.title,
             "content" to note.content,
-            "lastModified" to DateTypeConverters().fromDateTime(timeStamp).toString()
+            "lastModified" to DateTypeConverters().fromDateTime(timeStamp).toString(),
+            "archived" to note.archived
         )
 
         return suspendCoroutine {

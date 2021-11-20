@@ -126,6 +126,14 @@ class HomeActivity : AppCompatActivity() {
             intent.putExtra("currentUser", currentUser)
             startActivityForResult(intent, ADD_NEW_LABEL_REQUEST_CODE)
         }
+
+        homeViewModel.goToArchive.observe(this@HomeActivity) {
+            Utilities.fragmentSwitcher(
+                supportFragmentManager,
+                R.id.homeActivityFragment,
+                NotesListFragment(true)
+            )
+        }
     }
 
     private fun createNavigationDrawer() {
@@ -148,6 +156,7 @@ class HomeActivity : AppCompatActivity() {
             notesItemMenu.isChecked = false
             when (it.itemId) {
                 R.id.notes -> homeViewModel.goToNotesListFragment()
+                R.id.archive -> homeViewModel.goToArchive()
                 R.id.reminders -> Utilities.displayToast(this@HomeActivity, "Reminders Selected")
                 R.id.settings -> Utilities.displayToast(this@HomeActivity, "Settings Selected")
                 R.id.about -> Utilities.displayToast(this@HomeActivity, "About Selected")

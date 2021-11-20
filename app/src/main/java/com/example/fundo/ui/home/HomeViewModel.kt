@@ -38,6 +38,9 @@ class HomeViewModel : ViewModel() {
     private val _getLabelFromDB = MutableLiveData<ArrayList<Label>>()
     val getLabelFromDB = _getLabelFromDB as LiveData<ArrayList<Label>>
 
+    private val _goToArchive = MutableLiveData<Boolean>()
+    val goToArchive = _goToArchive as LiveData<Boolean>
+
     fun goToAuthenticationActivity(status: Boolean) {
         _goToAuthenticationActivity.value = status
     }
@@ -97,5 +100,9 @@ class HomeViewModel : ViewModel() {
 
     fun goToCreateNewLabel() {
         _goToCreateNewLabel.value = true
+    }
+
+    fun goToArchive() {
+        _goToArchive.value = true
     }
 }

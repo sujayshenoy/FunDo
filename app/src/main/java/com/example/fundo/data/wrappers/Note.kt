@@ -7,5 +7,6 @@ data class Note(
     var content: String,
     var id: Long = 0,
     var firebaseId: String = "",
-    var lastModified: Date? = null
+    var lastModified: Date? = null,
+    var archived: Boolean = false
 )
