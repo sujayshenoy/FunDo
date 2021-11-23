@@ -15,6 +15,9 @@ interface NoteDao {
     @Query("SELECT * from note WHERE archived = 1")
     suspend fun getArchives(): List<NoteEntity>
 
+    @Query("SELECT * from note WHERE NULLIF(reminder,'') IS NOT NULL")
+    suspend fun getReminders(): List<NoteEntity>
+
     @Update
     suspend fun updateNote(noteEntity: NoteEntity)
 

@@ -19,12 +19,10 @@ class SplashScreenActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        SharedPrefUtil.initSharedPref(this@SplashScreenActivity)
-
         val splashScreenIcon = binding.splashScreenIcon
         splashScreenIcon.alpha = 0f
         splashScreenIcon.animate().setDuration(500).alpha(1f).withEndAction {
-            if (SharedPrefUtil.getUserId() == 0L) {
+            if (SharedPrefUtil.getInstance(this@SplashScreenActivity).getUserId() == 0L) {
                 val intent = Intent(this@SplashScreenActivity, AuthenticationActivity::class.java)
                 finish()
                 startActivity(intent)

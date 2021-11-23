@@ -1,6 +1,7 @@
 package com.example.fundo.data.services
 
 import android.content.Context
+import com.example.fundo.common.Logger
 import com.example.fundo.common.NetworkService
 import com.example.fundo.data.wrappers.Label
 import com.example.fundo.data.wrappers.Note
@@ -143,6 +144,18 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
         return try {
             return withContext(Dispatchers.IO) {
                 return@withContext sqLiteDatabaseService.getArchivedNotes(user)
+            }
+        } catch (ex: FirebaseException) {
+            ex.printStackTrace()
+            listOf()
+        }
+    }
+
+    suspend fun getReminderNotes(user: User?): List<Note> {
+        Logger.logDbInfo("DATA layer: called reminder")
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext sqLiteDatabaseService.getReminderNotes(user)
             }
         } catch (ex: FirebaseException) {
             ex.printStackTrace()

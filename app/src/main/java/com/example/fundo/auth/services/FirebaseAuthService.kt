@@ -83,7 +83,7 @@ object FirebaseAuthService {
     }
 
     suspend fun signOut(context: Context, callback: (Boolean) -> Unit) {
-        SharedPrefUtil.clearAll()
+        SharedPrefUtil.getInstance(context).clearAll()
         DatabaseService.getInstance(context).clearLocalDB()
         auth.signOut()
         LoginManager.getInstance().logOut()

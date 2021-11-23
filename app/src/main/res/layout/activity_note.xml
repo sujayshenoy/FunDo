@@ -33,34 +33,85 @@
         android:tag="archive"
         android:visibility="gone" />
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/reminderButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/archiveButton"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/button_reminder_filled"
+        android:visibility="gone"/>
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/backButton"
-        android:layout_marginTop="30dp">
+        android:layout_marginTop="16dp"
+        android:scrollbarThumbHorizontal="@null"
+        android:scrollbarThumbVertical="@null">
 
-        <EditText
-            android:id="@+id/titleTextEdit"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:background="@null"
-            android:hint="@string/note_title"
-            android:textSize="30sp" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/contentTextEdit"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/titleTextEdit"
-            android:layout_marginTop="10dp"
-            android:background="@null"
-            android:gravity="start"
-            android:hint="@string/note_content"
-            android:textSize="20sp" />
-    </RelativeLayout>
+            <EditText
+                android:id="@+id/titleTextEdit"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="@null"
+                android:hint="@string/note_title"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textSize="28sp" />
 
+            <EditText
+                android:id="@+id/contentTextEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/titleTextEdit"
+                android:layout_marginTop="10dp"
+                android:background="@null"
+                android:gravity="start"
+                android:hint="@string/note_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textSize="20sp" />
+
+            <RelativeLayout
+                android:id="@+id/reminderLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_below="@id/contentTextEdit"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/border_rounded_black"
+                android:backgroundTint="@color/app_secondary_light"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/clockIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/icon_alarm" />
+
+                <TextView
+                    android:id="@+id/reminderTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@id/clockIcon"
+                    android:text="Tomorrow, 8:00 am" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/saveNoteFab"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

@@ -8,5 +8,6 @@ data class Note(
     var id: Long = 0,
     var firebaseId: String = "",
     var lastModified: Date? = null,
-    var archived: Boolean = false
+    var archived: Boolean = false,
+    var reminder: Date? = null
 )
