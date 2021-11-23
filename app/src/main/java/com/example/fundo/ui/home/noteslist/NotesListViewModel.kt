@@ -23,6 +23,9 @@ class NotesListViewModel : ViewModel() {
     private val _getArchivedNotesFromDB = MutableLiveData<List<Note>>()
     val getArchivedNotesFromDB = _getArchivedNotesFromDB as LiveData<List<Note>>
 
+    private val _getReminderNotesFromDB = MutableLiveData<List<Note>>()
+    val getReminderNotesFromDB = _getReminderNotesFromDB as LiveData<List<Note>>
+
     private val _updateNoteInDB = MutableLiveData<Note>()
     val updateNoteInDB = _updateNoteInDB as LiveData<Note>
 
@@ -68,6 +71,14 @@ class NotesListViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             DatabaseService.getInstance(context).getArchivedNotes(user).let {
                 _getArchivedNotesFromDB.postValue(it)
+            }
+        }
+    }
+
+    fun getReminderNotes(context: Context, user: User) {
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseService.getInstance(context).getReminderNotes(user).let {
+                _getReminderNotesFromDB.postValue(it)
             }
         }
     }

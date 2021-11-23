@@ -60,7 +60,8 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
                 title = note.title,
                 content = note.content,
                 lastModified = timeStamp!!,
-                archived = note.archived
+                archived = note.archived,
+                reminder = note.reminder
             )
             note.id = noteDao.addNote(noteEntity)
             if (!onlineMode) {
@@ -79,7 +80,8 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
                 val note = Note(
                     title = i.title, content = i.content, id = i.nid,
                     firebaseId = i.fid, lastModified = i.lastModified,
-                    archived = i.archived
+                    archived = i.archived,
+                    reminder = i.reminder
                 )
                 noteList.add(note)
             }
@@ -95,7 +97,7 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
                 val note = Note(
                     title = i.title, content = i.content, id = i.nid,
                     firebaseId = i.fid, lastModified = i.lastModified,
-                    archived = i.archived
+                    archived = i.archived, reminder = i.reminder
                 )
                 noteList.add(note)
             }
@@ -103,6 +105,22 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
         }
     }
 
+    suspend fun getReminderNotes(user: User?): List<Note> {
+        return withContext(Dispatchers.IO) {
+            val noteEntityList = noteDao.getReminders()
+            Logger.logInfo("SQLSERVICE: $noteEntityList")
+            val noteList = mutableListOf<Note>()
+            for (i in noteEntityList) {
+                val note = Note(
+                    title = i.title, content = i.content, id = i.nid,
+                    firebaseId = i.fid, lastModified = i.lastModified,
+                    archived = i.archived, reminder = i.reminder
+                )
+                noteList.add(note)
+            }
+            noteList
+        }
+    }
 
     override suspend fun updateNoteInDB(
         note: Note,
@@ -117,7 +135,8 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
                 note.title,
                 note.content,
                 lastModified = timeStamp!!,
-                archived = note.archived
+                archived = note.archived,
+                reminder = note.reminder
             )
             Logger.logInfo("NoteEntity: $noteEntity")
             noteDao.updateNote(noteEntity)

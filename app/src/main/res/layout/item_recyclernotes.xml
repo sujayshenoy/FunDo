@@ -3,8 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/border_rounded_black"
-    android:padding="10dp"
-    android:layout_margin="5dp">
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:layout_margin="8dp"
+    android:elevation="2dp">
 
     <TextView
         android:id="@+id/titleTextView"
@@ -22,4 +26,34 @@
         android:layout_marginTop="2dp"
         android:text="@string/note_content"
         android:textSize="20sp" />
+
+    <RelativeLayout
+        android:id="@+id/reminderLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contentTextView"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/border_rounded_black"
+        android:backgroundTint="@color/app_secondary_light"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/clockIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@drawable/icon_alarm" />
+
+        <TextView
+            android:id="@+id/reminderTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/clockIcon"
+            android:maxLines="1"
+            android:text="Tomorrow, 8:00 am"
+            android:textSize="12sp" />
+    </RelativeLayout>
 </RelativeLayout>

@@ -113,10 +113,14 @@ class HomeActivity : AppCompatActivity() {
 
     private fun initNavigator() {
         homeViewModel.goToNotesList.observe(this@HomeActivity) {
+            val noteListFragment = NotesListFragment()
+            val bundle = Bundle()
+            bundle.putString("type", "normal")
+            noteListFragment.arguments = bundle
             Utilities.fragmentSwitcher(
                 supportFragmentManager,
                 R.id.homeActivityFragment,
-                NotesListFragment()
+                noteListFragment
             )
         }
 
@@ -128,10 +132,26 @@ class HomeActivity : AppCompatActivity() {
         }
 
         homeViewModel.goToArchive.observe(this@HomeActivity) {
+            val noteListFragment = NotesListFragment()
+            val bundle = Bundle()
+            bundle.putString("type", "archive")
+            noteListFragment.arguments = bundle
             Utilities.fragmentSwitcher(
                 supportFragmentManager,
                 R.id.homeActivityFragment,
-                NotesListFragment(true)
+                noteListFragment
+            )
+        }
+
+        homeViewModel.goToReminder.observe(this@HomeActivity) {
+            val noteListFragment = NotesListFragment()
+            val bundle = Bundle()
+            bundle.putString("type", "reminder")
+            noteListFragment.arguments = bundle
+            Utilities.fragmentSwitcher(
+                supportFragmentManager,
+                R.id.homeActivityFragment,
+                noteListFragment
             )
         }
     }
@@ -157,7 +177,7 @@ class HomeActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.notes -> homeViewModel.goToNotesListFragment()
                 R.id.archive -> homeViewModel.goToArchive()
-                R.id.reminders -> Utilities.displayToast(this@HomeActivity, "Reminders Selected")
+                R.id.reminders -> homeViewModel.goToReminder()
                 R.id.settings -> Utilities.displayToast(this@HomeActivity, "Settings Selected")
                 R.id.about -> Utilities.displayToast(this@HomeActivity, "About Selected")
                 R.id.logout -> homeViewModel.logout(this@HomeActivity)

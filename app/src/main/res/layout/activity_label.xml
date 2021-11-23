@@ -43,12 +43,13 @@
             android:id="@+id/newLabelTextEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_toStartOf="@id/saveNewLabelButton"
+            android:layout_toEndOf="@id/addNewLabelButton"
             android:background="@null"
             android:hint="@string/create_new_label_textedit"
-            android:textSize="18sp"
-            android:layout_centerInParent="true"
-            android:layout_toEndOf="@id/addNewLabelButton"
-            android:layout_toStartOf="@id/saveNewLabelButton"/>
+            android:maxLines="1"
+            android:textSize="18sp" />
 
         <ImageView
             android:id="@+id/saveNewLabelButton"

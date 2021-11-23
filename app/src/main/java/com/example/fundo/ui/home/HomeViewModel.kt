@@ -41,6 +41,9 @@ class HomeViewModel : ViewModel() {
     private val _goToArchive = MutableLiveData<Boolean>()
     val goToArchive = _goToArchive as LiveData<Boolean>
 
+    private val _goToReminder = MutableLiveData<Boolean>()
+    val goToReminder = _goToReminder as LiveData<Boolean>
+
     fun goToAuthenticationActivity(status: Boolean) {
         _goToAuthenticationActivity.value = status
     }
@@ -83,7 +86,7 @@ class HomeViewModel : ViewModel() {
 
     fun getUserFromDB(context: Context) {
         viewModelScope.launch {
-            val userId = SharedPrefUtil.getUserId()
+            val userId = SharedPrefUtil.getInstance(context).getUserId()
             if (userId > 0) {
                 val user = DatabaseService.getInstance(context).getUserFromDB(userId)
                 _getUserFromDB.postValue(user)
@@ -104,5 +107,9 @@ class HomeViewModel : ViewModel() {
 
     fun goToArchive() {
         _goToArchive.value = true
+    }
+
+    fun goToReminder() {
+        _goToReminder.value = true
     }
 }

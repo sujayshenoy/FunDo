@@ -3,11 +3,13 @@ package com.example.fundo.common
 import android.content.Context
 import android.content.SharedPreferences
 
-object SharedPrefUtil {
-    private lateinit var sharedPreferences: SharedPreferences
+class SharedPrefUtil(private val context: Context) {
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("FundoShaaredPref", Context.MODE_PRIVATE)
 
-    fun initSharedPref(context: Context) {
-        sharedPreferences = context.getSharedPreferences("FundoShaaredPref", Context.MODE_PRIVATE)
+    companion object {
+        private val instance: SharedPrefUtil? by lazy { null }
+        fun getInstance(context: Context) = instance ?: SharedPrefUtil(context)
     }
 
     fun addString(key: String, value: String) {

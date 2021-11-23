@@ -23,7 +23,7 @@ class SignUpViewModel : ViewModel() {
                         User(user.name, user.email, user.phone, user.id, userAuth.firebaseId)
                     DatabaseService.getInstance(context).addUserToCloudDB(newUser)
                     DatabaseService.getInstance(context).addUserToDB(newUser)?.let {
-                        SharedPrefUtil.addUserId(it.id)
+                        SharedPrefUtil.getInstance(context).addUserId(it.id)
                     }
                     _emailPassSignUpStatus.value = true
                 } else {

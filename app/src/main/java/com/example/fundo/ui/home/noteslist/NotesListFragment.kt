@@ -1,5 +1,6 @@
 package com.example.fundo.ui.home.noteslist
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -20,29 +21,81 @@ import com.example.fundo.data.wrappers.User
 import com.example.fundo.databinding.FragmentNoteListBinding
 import com.example.fundo.ui.home.HomeViewModel
 import com.example.fundo.ui.note.NoteActivity
+import java.util.*
+import kotlin.collections.ArrayList
 
-class NotesListFragment(private val archive: Boolean = false) :
+class NotesListFragment() :
     Fragment(R.layout.fragment_note_list) {
     private lateinit var binding: FragmentNoteListBinding
     private lateinit var notesListViewModel: NotesListViewModel
     private lateinit var homeViewModel: HomeViewModel
-    private var currentUser: User = User(name = "Name", email = "email", phone = "phone")
     private val noteList = mutableListOf<Note>()
     private var layoutFlag = true
     private lateinit var notesAdapter: NotesRecyclerAdapter
+    private lateinit var currentUser: User
+    private var archive: Boolean = false
+    private var reminder: Boolean = false
+    private lateinit var dialog: Dialog
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
+        dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_loading)
+        dialog.show()
         binding = FragmentNoteListBinding.bind(view)
         notesListViewModel = ViewModelProvider(requireActivity())[NotesListViewModel::class.java]
         homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
 
         homeViewModel.getUserFromDB(requireContext())
+        homeViewModel.getUserFromDB.observe(viewLifecycleOwner) {
+            currentUser = it
+            initVars()
+        }
+    }
+
+    private fun initVars() {
+        when (arguments?.getString("type").toString()) {
+            "archive" -> {
+                notesListViewModel.getArchivedNotes(requireContext(), currentUser)
+                archive = true
+                binding.addNewNoteFab.visibility = View.GONE
+            }
+            "reminder" -> {
+                notesListViewModel.getReminderNotes(requireContext(), currentUser)
+                reminder = true
+                binding.addNewNoteFab.visibility = View.GONE
+            }
+            else -> notesListViewModel.getNotesFromDB(requireContext(), currentUser)
+        }
+
+        initNotesRecyclerView()
+        fetchNotes()
+    }
+
+    private fun fetchNotes() {
+        notesListViewModel.getNotesFromDB.observe(viewLifecycleOwner) {
+            noteList.clear()
+            noteList.addAll(it)
+            notesAdapter.notifyDataSetChanged()
+        }
+
+        notesListViewModel.getArchivedNotesFromDB.observe(viewLifecycleOwner) {
+            noteList.clear()
+            noteList.addAll(it)
+            notesAdapter.notifyDataSetChanged()
+        }
+
+        notesListViewModel.getReminderNotesFromDB.observe(viewLifecycleOwner) {
+            noteList.clear()
+            noteList.addAll(it)
+            notesAdapter.notifyDataSetChanged()
+        }
+
         attachListeners()
         attachObservers()
-        initNotesRecyclerView()
+        dialog.dismiss()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -78,60 +131,53 @@ class NotesListFragment(private val archive: Boolean = false) :
     }
 
     private fun attachObservers() {
-        notesListViewModel.getNotesFromDB.observe(viewLifecycleOwner) {
-            noteList.clear()
-            noteList.addAll(it)
-            notesAdapter.notifyDataSetChanged()
-        }
-
-        notesListViewModel.getArchivedNotesFromDB.observe(viewLifecycleOwner) {
-            noteList.clear()
-            noteList.addAll(it)
-            notesAdapter.notifyDataSetChanged()
-        }
-
         notesListViewModel.addNoteToDB.observe(viewLifecycleOwner) {
-            noteList.add(it)
-            notesAdapter.notifyItemInserted(noteList.size)
+            when {
+                archive -> {
+                    notesListViewModel.getArchivedNotes(requireContext(), currentUser)
+                }
+                reminder -> {
+                    notesListViewModel.getReminderNotes(requireContext(), currentUser)
+                }
+                else -> {
+                    notesListViewModel.getNotesFromDB(requireContext(), currentUser)
+                }
+            }
         }
 
-        notesListViewModel.updateNoteInDB.observe(viewLifecycleOwner) { note ->
-            val targetNote = noteList.first { it.id == note.id }
-            val index = noteList.indexOf(targetNote)
-            targetNote.title = note.title
-            targetNote.content = note.content
-            targetNote.archived = note.archived
-            notesAdapter.notifyItemChanged(index)
 
-            if (archive && !targetNote.archived) {
-                notesAdapter.notifyItemRemoved(index)
-                noteList.removeAt(index)
-                Utilities.displayToast(requireContext(), "Note Unarchived")
-            } else if (!archive && targetNote.archived) {
-                notesAdapter.notifyItemRemoved(index)
-                noteList.removeAt(index)
-                Utilities.displayToast(requireContext(), "Note Archived")
+
+        notesListViewModel.updateNoteInDB.observe(viewLifecycleOwner) {
+            when {
+                archive -> {
+                    notesListViewModel.getArchivedNotes(requireContext(), currentUser)
+                }
+                reminder -> {
+                    notesListViewModel.getReminderNotes(requireContext(), currentUser)
+                }
+                else -> {
+                    notesListViewModel.getNotesFromDB(requireContext(), currentUser)
+                }
             }
         }
 
         notesListViewModel.deleteNoteFromDB.observe(viewLifecycleOwner) {
-            val notePos = noteList.indexOf(it)
-            noteList.remove(it)
-            notesAdapter.notifyItemRemoved(notePos)
+            when {
+                archive -> {
+                    notesListViewModel.getArchivedNotes(requireContext(), currentUser)
+                }
+                reminder -> {
+                    notesListViewModel.getReminderNotes(requireContext(), currentUser)
+                }
+                else -> {
+                    notesListViewModel.getNotesFromDB(requireContext(), currentUser)
+                }
+            }
         }
 
         notesListViewModel.syncDBStatus.observe(viewLifecycleOwner) {
             notesListViewModel.getNotesFromDB(requireContext(), currentUser)
             binding.swipeRefreshView.isRefreshing = false
-        }
-
-        homeViewModel.getUserFromDB.observe(viewLifecycleOwner) {
-            currentUser = it
-            if (archive) {
-                notesListViewModel.getArchivedNotes(requireContext(), currentUser)
-            } else {
-                notesListViewModel.getNotesFromDB(requireContext(), currentUser)
-            }
         }
     }
 
@@ -147,9 +193,6 @@ class NotesListFragment(private val archive: Boolean = false) :
     }
 
     private fun initNotesRecyclerView() {
-        if (archive) {
-            binding.addNewNoteFab.visibility = View.GONE
-        }
         notesAdapter = NotesRecyclerAdapter(noteList as ArrayList<Note>)
         val notesRecyclerView = binding.notesRecyclerView
         notesRecyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
@@ -162,6 +205,7 @@ class NotesListFragment(private val archive: Boolean = false) :
                 intent.putExtra("title", note.title)
                 intent.putExtra("content", note.content)
                 intent.putExtra("archived", note.archived)
+                intent.putExtra("reminder", note.reminder)
                 startActivityForResult(intent, Constants.UPDATE_NOTE_REQUEST_CODE)
             }
         })
@@ -209,11 +253,19 @@ class NotesListFragment(private val archive: Boolean = false) :
         val title = noteBundle?.getString("title").toString()
         val content = noteBundle?.getString("content").toString()
         val archived = noteBundle?.getBoolean("archived") ?: false
+        val reminder = noteBundle?.getSerializable("reminder") as? Date
 
         if (title.isNotEmpty() || content.isNotEmpty()) {
             val updateNote = noteList.find { it.id == id }!!
             val note =
-                Note(title, content, updateNote.id, updateNote.firebaseId, archived = archived)
+                Note(
+                    title,
+                    content,
+                    updateNote.id,
+                    updateNote.firebaseId,
+                    archived = archived,
+                    reminder = reminder
+                )
             notesListViewModel.updateNoteInDB(requireContext(), note, currentUser)
         } else {
             handleDeleteNote(noteBundle)

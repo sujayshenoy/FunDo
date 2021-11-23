@@ -5,10 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundo.R
 import com.example.fundo.data.wrappers.Note
+import java.text.SimpleDateFormat
 
 class NotesRecyclerAdapter(private val notesList: ArrayList<Note>) :
     RecyclerView.Adapter<NotesRecyclerAdapter.NotesViewHolder>(), Filterable {
@@ -25,6 +27,15 @@ class NotesRecyclerAdapter(private val notesList: ArrayList<Note>) :
         val currentNote = tempList[position]
         holder.titleText.text = currentNote.title
         holder.contentText.text = currentNote.content
+
+        if (currentNote.reminder != null) {
+            val formatter = SimpleDateFormat("dd MMM, hh:mm aa")
+            val date = formatter.format(currentNote.reminder)
+            holder.reminderLayout.visibility = View.VISIBLE
+            holder.reminderText.text = date
+        } else {
+            holder.reminderLayout.visibility = View.GONE
+        }
 
         if (currentNote.title.isEmpty()) {
             holder.titleText.visibility = View.GONE
@@ -46,6 +57,8 @@ class NotesRecyclerAdapter(private val notesList: ArrayList<Note>) :
         RecyclerView.ViewHolder(itemView) {
         val titleText: TextView = itemView.findViewById(R.id.titleTextView)
         val contentText: TextView = itemView.findViewById(R.id.contentTextView)
+        val reminderText: TextView = itemView.findViewById(R.id.reminderTextView)
+        val reminderLayout: RelativeLayout = itemView.findViewById(R.id.reminderLayout)
 
         init {
             itemView.setOnClickListener {

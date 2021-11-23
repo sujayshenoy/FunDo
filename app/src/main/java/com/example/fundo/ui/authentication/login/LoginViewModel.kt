@@ -24,7 +24,7 @@ class LoginViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 if (user != null) {
                     DatabaseService.getInstance(context).addUserToDB(user)?.let {
-                        SharedPrefUtil.addUserId(it.id)
+                        SharedPrefUtil.getInstance(context).addUserId(it.id)
                         DatabaseService.getInstance(context).addCloudDataToLocalDB(it)
                     }
                     _emailPassLoginStatus.postValue(true)
@@ -43,7 +43,7 @@ class LoginViewModel : ViewModel() {
                         DatabaseService.getInstance(context).addUserToCloudDB(user)
                     }
                     DatabaseService.getInstance(context).addUserToDB(user)?.let {
-                        SharedPrefUtil.addUserId(it.id)
+                        SharedPrefUtil.getInstance(context).addUserId(it.id)
                         DatabaseService.getInstance(context).addCloudDataToLocalDB(it)
                     }
                     _facebookLoginStatus.postValue(true)
