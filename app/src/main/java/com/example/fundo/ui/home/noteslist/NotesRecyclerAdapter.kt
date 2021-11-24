@@ -3,49 +3,50 @@ package com.example.fundo.ui.home.noteslist
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fundo.R
+import com.example.fundo.common.Logger
 import com.example.fundo.data.wrappers.Note
 import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class NotesRecyclerAdapter(private val notesList: ArrayList<Note>) :
-    RecyclerView.Adapter<NotesRecyclerAdapter.NotesViewHolder>(), Filterable {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
     private lateinit var recyclerListener: OnItemClickListener
     private var tempList = notesList
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
-        val itemView =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_recyclernotes, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val itemView = inflater.inflate(R.layout.item_recyclernotes, parent, false)
         return NotesViewHolder(itemView, recyclerListener)
     }
 
-    override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val notesViewHolder = holder as NotesViewHolder
         val currentNote = tempList[position]
-        holder.titleText.text = currentNote.title
-        holder.contentText.text = currentNote.content
+        notesViewHolder.titleText.text = currentNote.title
+        notesViewHolder.contentText.text = currentNote.content
 
         if (currentNote.reminder != null) {
-            val formatter = SimpleDateFormat("dd MMM, hh:mm aa")
+            val formatter = SimpleDateFormat("dd MMM, hh:mm aa", Locale.getDefault())
             val date = formatter.format(currentNote.reminder)
-            holder.reminderLayout.visibility = View.VISIBLE
-            holder.reminderText.text = date
+            notesViewHolder.reminderLayout.visibility = View.VISIBLE
+            notesViewHolder.reminderText.text = date
         } else {
-            holder.reminderLayout.visibility = View.GONE
+            notesViewHolder.reminderLayout.visibility = View.GONE
         }
 
         if (currentNote.title.isEmpty()) {
-            holder.titleText.visibility = View.GONE
+            notesViewHolder.titleText.visibility = View.GONE
         } else {
-            holder.titleText.visibility = View.VISIBLE
+            notesViewHolder.titleText.visibility = View.VISIBLE
         }
         if (currentNote.content.isEmpty()) {
-            holder.contentText.visibility = View.GONE
+            notesViewHolder.contentText.visibility = View.GONE
         } else {
-            holder.contentText.visibility = View.VISIBLE
+            notesViewHolder.contentText.visibility = View.VISIBLE
         }
     }
 

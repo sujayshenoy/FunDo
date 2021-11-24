@@ -20,6 +20,15 @@ class NotesListViewModel : ViewModel() {
     private val _getNotesFromDB = MutableLiveData<List<Note>>()
     val getNotesFromDB = _getNotesFromDB as LiveData<List<Note>>
 
+    private val _getNotesPaged = MutableLiveData<List<Note>>()
+    val getNotesPaged = _getNotesPaged as LiveData<List<Note>>
+
+    private val _getArchivesPaged = MutableLiveData<List<Note>>()
+    val getArchivesPaged = _getArchivesPaged as LiveData<List<Note>>
+
+    private val _getRemindersPaged = MutableLiveData<List<Note>>()
+    val getRemindersPaged = _getRemindersPaged as LiveData<List<Note>>
+
     private val _getArchivedNotesFromDB = MutableLiveData<List<Note>>()
     val getArchivedNotesFromDB = _getArchivedNotesFromDB as LiveData<List<Note>>
 
@@ -34,6 +43,9 @@ class NotesListViewModel : ViewModel() {
 
     private val _syncDBStatus = MutableLiveData<Boolean>()
     val syncDBStatus = _syncDBStatus as LiveData<Boolean>
+
+    private val _getNotesCount = MutableLiveData<Int>()
+    val getNotesCount = _getNotesCount as LiveData<Int>
 
     fun addNoteToDB(context: Context, note: Note, user: User) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -61,15 +73,47 @@ class NotesListViewModel : ViewModel() {
 
     fun getNotesFromDB(context: Context, user: User) {
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.getInstance(context).getNotesFromDB(user).let {
+            DatabaseService.getInstance(context).getNotesPaged(10, 0).let {
                 _getNotesFromDB.postValue(it)
+            }
+        }
+    }
+
+    fun getNotesPaged(context: Context, limit: Int, offset: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseService.getInstance(context).getNotesPaged(limit, offset).let {
+                _getNotesPaged.postValue(it)
+            }
+        }
+    }
+
+    fun getArchivesPaged(context: Context, limit: Int, offset: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseService.getInstance(context).getArchivesPaged(limit, offset).let {
+                _getArchivesPaged.postValue(it)
+            }
+        }
+    }
+
+    fun getRemindersPaged(context: Context, limit: Int, offset: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseService.getInstance(context).getRemindersPaged(limit, offset).let {
+                _getRemindersPaged.postValue(it)
+            }
+        }
+    }
+
+    fun getNotesCount(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseService.getInstance(context).getNotesCount().let {
+                _getNotesCount.postValue(it)
             }
         }
     }
 
     fun getArchivedNotes(context: Context, user: User) {
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.getInstance(context).getArchivedNotes(user).let {
+            DatabaseService.getInstance(context).getArchivesPaged(10, 0).let {
                 _getArchivedNotesFromDB.postValue(it)
             }
         }
@@ -77,7 +121,7 @@ class NotesListViewModel : ViewModel() {
 
     fun getReminderNotes(context: Context, user: User) {
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseService.getInstance(context).getReminderNotes(user).let {
+            DatabaseService.getInstance(context).getRemindersPaged(10, 0).let {
                 _getReminderNotesFromDB.postValue(it)
             }
         }

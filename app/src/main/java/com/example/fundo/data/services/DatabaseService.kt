@@ -140,6 +140,50 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
         }
     }
 
+    suspend fun getNotesCount(): Int {
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext sqLiteDatabaseService.getNotesCount()
+            }
+        } catch (ex: FirebaseException) {
+            ex.printStackTrace()
+            0
+        }
+    }
+
+    suspend fun getNotesPaged(limit: Int, offset: Int): List<Note> {
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext sqLiteDatabaseService.getNotesPaged(limit, offset)
+            }
+        } catch (ex: FirebaseException) {
+            ex.printStackTrace()
+            listOf()
+        }
+    }
+
+    suspend fun getArchivesPaged(limit: Int, offset: Int): List<Note> {
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext sqLiteDatabaseService.getArchivedNotesPaged(limit, offset)
+            }
+        } catch (ex: FirebaseException) {
+            ex.printStackTrace()
+            listOf()
+        }
+    }
+
+    suspend fun getRemindersPaged(limit: Int, offset: Int): List<Note> {
+        return try {
+            return withContext(Dispatchers.IO) {
+                return@withContext sqLiteDatabaseService.getReminderNotesPaged(limit, offset)
+            }
+        } catch (ex: FirebaseException) {
+            ex.printStackTrace()
+            listOf()
+        }
+    }
+
     suspend fun getArchivedNotes(user: User?): List<Note> {
         return try {
             return withContext(Dispatchers.IO) {
