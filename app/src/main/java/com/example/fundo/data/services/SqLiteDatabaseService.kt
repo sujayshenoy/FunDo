@@ -72,9 +72,32 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
         }
     }
 
-    override suspend fun getNotesFromDB(user: User?): List<Note>? {
+    override suspend fun getNotesFromDB(user: User?): List<Note> {
         return withContext(Dispatchers.IO) {
             val noteEntityList = noteDao.getNotes()
+            val noteList = mutableListOf<Note>()
+            for (i in noteEntityList) {
+                val note = Note(
+                    title = i.title, content = i.content, id = i.nid,
+                    firebaseId = i.fid, lastModified = i.lastModified,
+                    archived = i.archived,
+                    reminder = i.reminder
+                )
+                noteList.add(note)
+            }
+            noteList
+        }
+    }
+
+    suspend fun getNotesCount(): Int {
+        return withContext(Dispatchers.IO) {
+            return@withContext noteDao.getNotesCount()
+        }
+    }
+
+    suspend fun getNotesPaged(limit: Int, offset: Int): List<Note> {
+        return withContext(Dispatchers.IO) {
+            val noteEntityList = noteDao.getNotesPaged(limit, offset)
             val noteList = mutableListOf<Note>()
             for (i in noteEntityList) {
                 val note = Note(
@@ -105,10 +128,41 @@ class SqLiteDatabaseService(context: Context) : DatabaseInterface {
         }
     }
 
+    suspend fun getArchivedNotesPaged(limit: Int, offset: Int): List<Note> {
+        return withContext(Dispatchers.IO) {
+            val noteEntityList = noteDao.getArchivesPaged(limit, offset)
+            val noteList = mutableListOf<Note>()
+            for (i in noteEntityList) {
+                val note = Note(
+                    title = i.title, content = i.content, id = i.nid,
+                    firebaseId = i.fid, lastModified = i.lastModified,
+                    archived = i.archived, reminder = i.reminder
+                )
+                noteList.add(note)
+            }
+            noteList
+        }
+    }
+
     suspend fun getReminderNotes(user: User?): List<Note> {
         return withContext(Dispatchers.IO) {
             val noteEntityList = noteDao.getReminders()
-            Logger.logInfo("SQLSERVICE: $noteEntityList")
+            val noteList = mutableListOf<Note>()
+            for (i in noteEntityList) {
+                val note = Note(
+                    title = i.title, content = i.content, id = i.nid,
+                    firebaseId = i.fid, lastModified = i.lastModified,
+                    archived = i.archived, reminder = i.reminder
+                )
+                noteList.add(note)
+            }
+            noteList
+        }
+    }
+
+    suspend fun getReminderNotesPaged(limit: Int, offset: Int): List<Note> {
+        return withContext(Dispatchers.IO) {
+            val noteEntityList = noteDao.getRemindersPaged(limit, offset)
             val noteList = mutableListOf<Note>()
             for (i in noteEntityList) {
                 val note = Note(

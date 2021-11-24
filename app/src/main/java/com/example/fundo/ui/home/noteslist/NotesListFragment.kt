@@ -11,16 +11,21 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.fundo.R
 import com.example.fundo.common.Logger
 import com.example.fundo.common.Utilities
 import com.example.fundo.config.Constants
+import com.example.fundo.data.services.DatabaseService
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.databinding.FragmentNoteListBinding
 import com.example.fundo.ui.home.HomeViewModel
 import com.example.fundo.ui.note.NoteActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -36,6 +41,8 @@ class NotesListFragment() :
     private var archive: Boolean = false
     private var reminder: Boolean = false
     private lateinit var dialog: Dialog
+    private var totalNotes: Int = 0
+    private var isLoading = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -75,10 +82,16 @@ class NotesListFragment() :
     }
 
     private fun fetchNotes() {
+        notesListViewModel.getNotesCount(requireContext())
         notesListViewModel.getNotesFromDB.observe(viewLifecycleOwner) {
             noteList.clear()
             noteList.addAll(it)
+            notesListViewModel.getNotesCount(requireContext())
             notesAdapter.notifyDataSetChanged()
+        }
+
+        notesListViewModel.getNotesCount.observe(viewLifecycleOwner) {
+            totalNotes = it
         }
 
         notesListViewModel.getArchivedNotesFromDB.observe(viewLifecycleOwner) {
@@ -132,6 +145,7 @@ class NotesListFragment() :
 
     private fun attachObservers() {
         notesListViewModel.addNoteToDB.observe(viewLifecycleOwner) {
+            notesListViewModel.getNotesCount(requireContext())
             when {
                 archive -> {
                     notesListViewModel.getArchivedNotes(requireContext(), currentUser)
@@ -145,7 +159,26 @@ class NotesListFragment() :
             }
         }
 
+        notesListViewModel.getNotesPaged.observe(viewLifecycleOwner) {
+            isLoading = false
+            noteList.addAll(it)
+            notesAdapter.notifyDataSetChanged()
+            resetListLoader()
+        }
 
+        notesListViewModel.getArchivesPaged.observe(viewLifecycleOwner) {
+            isLoading = false
+            noteList.addAll(it)
+            notesAdapter.notifyDataSetChanged()
+            resetListLoader()
+        }
+
+        notesListViewModel.getRemindersPaged.observe(viewLifecycleOwner) {
+            isLoading = false
+            noteList.addAll(it)
+            notesAdapter.notifyDataSetChanged()
+            resetListLoader()
+        }
 
         notesListViewModel.updateNoteInDB.observe(viewLifecycleOwner) {
             when {
@@ -195,6 +228,7 @@ class NotesListFragment() :
     private fun initNotesRecyclerView() {
         notesAdapter = NotesRecyclerAdapter(noteList as ArrayList<Note>)
         val notesRecyclerView = binding.notesRecyclerView
+
         notesRecyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
         notesRecyclerView.setHasFixedSize(true)
         notesAdapter.setOnItemClickListener(object : NotesRecyclerAdapter.OnItemClickListener {
@@ -210,6 +244,78 @@ class NotesListFragment() :
             }
         })
 
+        notesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (notesRecyclerView.layoutManager is LinearLayoutManager) {
+                    val layoutManager = notesRecyclerView.layoutManager as LinearLayoutManager
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
+
+                    if (((visibleItemCount + firstVisibleItem) >= totalItemCount) && (totalItemCount < totalNotes)) {
+                        isLoading = true
+                        when {
+                            archive -> {
+                                notesListViewModel.getArchivesPaged(
+                                    requireContext(),
+                                    10,
+                                    totalItemCount
+                                )
+                            }
+                            reminder -> {
+                                notesListViewModel.getRemindersPaged(
+                                    requireContext(),
+                                    10,
+                                    totalItemCount
+                                )
+                            }
+                            else -> {
+                                notesListViewModel.getNotesPaged(
+                                    requireContext(),
+                                    10,
+                                    totalItemCount
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    val layoutManager =
+                        notesRecyclerView.layoutManager as StaggeredGridLayoutManager
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisibleItem = layoutManager.findFirstVisibleItemPositions(null)
+
+                    if (((visibleItemCount + firstVisibleItem[0]) >= totalItemCount) && (totalItemCount < totalNotes)) {
+                        isLoading = true
+                        when {
+                            archive -> {
+                                notesListViewModel.getArchivesPaged(
+                                    requireContext(),
+                                    10,
+                                    totalItemCount
+                                )
+                            }
+                            reminder -> {
+                                notesListViewModel.getRemindersPaged(
+                                    requireContext(),
+                                    10,
+                                    totalItemCount
+                                )
+                            }
+                            else -> {
+                                notesListViewModel.getNotesPaged(
+                                    requireContext(),
+                                    10,
+                                    totalItemCount
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        })
         notesRecyclerView.adapter = notesAdapter
     }
 
@@ -276,5 +382,13 @@ class NotesListFragment() :
         val id = noteBundle?.getLong("id")
         val deleteNote = noteList.find { it.id == id }!!
         notesListViewModel.deleteNoteFromDB(requireContext(), deleteNote, currentUser)
+    }
+
+    private fun resetListLoader() {
+        if (isLoading) {
+            binding.progressBar.visibility = View.VISIBLE
+        } else {
+            binding.progressBar.visibility = View.GONE
+        }
     }
 }
