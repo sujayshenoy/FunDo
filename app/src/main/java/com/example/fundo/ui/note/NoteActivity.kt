@@ -2,8 +2,10 @@ package com.example.fundo.ui.note
 
 import android.app.*
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import com.example.fundo.R
@@ -20,6 +22,7 @@ class NoteActivity : AppCompatActivity() {
     private var content = ""
     private var reminder: Date? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -122,7 +125,7 @@ class NoteActivity : AppCompatActivity() {
                     TimePickerDialog(
                         this@NoteActivity, { _, hour, minute ->
                             val pickedDateTime = Calendar.getInstance()
-                            pickedDateTime.set(year, month, day, hour, minute)
+                            pickedDateTime.set(year, month, day, hour, minute,0)
                             Logger.logInfo("Picked: ${pickedDateTime.time}")
                             reminder = pickedDateTime.time
                             binding.reminderLayout.visibility = View.VISIBLE

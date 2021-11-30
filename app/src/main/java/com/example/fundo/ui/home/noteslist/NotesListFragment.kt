@@ -1,32 +1,35 @@
 package com.example.fundo.ui.home.noteslist
 
-import android.app.Dialog
+import android.app.*
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.work.*
 import com.example.fundo.R
-import com.example.fundo.common.Logger
+import com.example.fundo.common.NotifyWorker
+import com.example.fundo.common.NotifyWorker.Companion.CHANNEL_ID
 import com.example.fundo.common.Utilities
 import com.example.fundo.config.Constants
-import com.example.fundo.data.services.DatabaseService
+import com.example.fundo.data.room.DateTypeConverters
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.databinding.FragmentNoteListBinding
 import com.example.fundo.ui.home.HomeViewModel
 import com.example.fundo.ui.note.NoteActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class NotesListFragment() :
@@ -44,6 +47,7 @@ class NotesListFragment() :
     private var totalNotes: Int = 0
     private var isLoading = false
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
@@ -60,6 +64,41 @@ class NotesListFragment() :
             currentUser = it
             initVars()
         }
+
+        createNotificationChannel()
+    }
+
+    private fun scheduleNotification(note: Note,cancel: Boolean = false) {
+        val inputData = Data.Builder()
+            .putString("title",note.title)
+            .putString("content",note.content)
+            .putLong("id",note.id)
+            .putBoolean("archived", note.archived)
+            .putString("reminder", DateTypeConverters().fromDateTime(note.reminder))
+            .build()
+
+        if(!cancel) {
+            val notificationWork = OneTimeWorkRequestBuilder<NotifyWorker>()
+                .setInitialDelay(note.reminder!!.time - System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .setInputData(inputData)
+                .addTag(note.title)
+                .build()
+            WorkManager.getInstance(requireContext()).enqueueUniqueWork(note.firebaseId,ExistingWorkPolicy.REPLACE,notificationWork)
+            Utilities.displayToast(requireContext(), "Notification set at ${note.reminder}")
+        }
+        else {
+            WorkManager.getInstance(requireContext()).cancelUniqueWork(note.firebaseId)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel() {
+        val name = "Fundo Notify Channel"
+        val desc = "Fundo Notification"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel(CHANNEL_ID, name, importance)
+        val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
     private fun initVars() {
@@ -373,6 +412,12 @@ class NotesListFragment() :
                     reminder = reminder
                 )
             notesListViewModel.updateNoteInDB(requireContext(), note, currentUser)
+
+            if(reminder != null) {
+                scheduleNotification(note)
+            } else {
+                scheduleNotification(note,true)
+            }
         } else {
             handleDeleteNote(noteBundle)
         }
