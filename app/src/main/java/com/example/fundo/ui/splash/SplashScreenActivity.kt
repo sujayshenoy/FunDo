@@ -8,6 +8,9 @@ import com.example.fundo.data.services.DatabaseService
 import com.example.fundo.ui.authentication.AuthenticationActivity
 import com.example.fundo.ui.home.HomeActivity
 import com.example.fundo.common.SharedPrefUtil
+import com.example.fundo.common.Utilities
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import kotlinx.coroutines.*
 
 class SplashScreenActivity : AppCompatActivity() {
@@ -34,5 +37,10 @@ class SplashScreenActivity : AppCompatActivity() {
                 }
             }
         }
+
+        Firebase.messaging.subscribeToTopic("general")
+            .addOnCompleteListener {
+                Utilities.displayToast(this,"Subscribed to general")
+            }
     }
 }
