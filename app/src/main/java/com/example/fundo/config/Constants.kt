@@ -11,6 +11,7 @@ object Constants {
     const val ADD_NEW_NOTE_REQUEST_CODE = 2
     const val UPDATE_NOTE_REQUEST_CODE = 3
     const val ADD_NEW_LABEL_REQUEST_CODE = 4
+    const val ASSOCIATE_LABEL_REQUEST_CODE = 5
 
     //DATABASE OFFLINE OPERATION CODES
     const val CREATE_OP_CODE = 0

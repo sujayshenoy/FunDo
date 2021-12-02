@@ -33,6 +33,7 @@ import com.example.fundo.data.services.DatabaseService
 import com.example.fundo.data.wrappers.Label
 import com.example.fundo.data.wrappers.User
 import com.example.fundo.ui.home.label.LabelActivity
+import com.example.fundo.ui.home.label.LabelActivity.Companion.MODE_ADD
 import com.example.fundo.ui.home.noteslist.NotesListFragment
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.*
@@ -126,8 +127,8 @@ class HomeActivity : AppCompatActivity() {
 
         homeViewModel.goToCreateNewLabel.observe(this@HomeActivity) {
             val intent = Intent(this@HomeActivity, LabelActivity::class.java)
-            intent.putExtra("labelList", labelsList)
             intent.putExtra("currentUser", currentUser)
+            intent.putExtra("mode",MODE_ADD)
             startActivityForResult(intent, ADD_NEW_LABEL_REQUEST_CODE)
         }
 
@@ -236,6 +237,16 @@ class HomeActivity : AppCompatActivity() {
 
             dialog.dismiss()
         }
+
+        homeViewModel.getNotesWithLabel.observe(this@HomeActivity) {
+            Logger.logInfo("=========================HOME===============================")
+            Logger.logInfo("Associated Notes: ")
+            it.forEach {
+                Logger.logInfo("Note: $it")
+            }
+            Logger.logInfo("============================================================")
+            Utilities.displayToast(this,"Notes Fetched")
+        }
     }
 
     private fun loadLabelsIntoDrawer() {
@@ -244,7 +255,10 @@ class HomeActivity : AppCompatActivity() {
         val subMenu = navMenu.addSubMenu(R.id.labels, Menu.NONE, 2, "Labels")
         labelsList.forEachIndexed { index, label ->
             subMenu.add(0, Menu.NONE, index, label.name)
-                .setIcon(R.drawable.icon_label)
+                .setIcon(R.drawable.icon_label).setOnMenuItemClickListener {
+                    homeViewModel.getNotesWithLabel(this@HomeActivity, label.firebaseId, currentUser)
+                    true
+                }
         }
         subMenu.add(0, Menu.NONE, labelsList.size, "Create New Label")
             .setIcon(R.drawable.button_add).setOnMenuItemClickListener {

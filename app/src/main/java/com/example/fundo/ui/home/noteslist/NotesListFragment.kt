@@ -279,6 +279,8 @@ class NotesListFragment() :
                 intent.putExtra("content", note.content)
                 intent.putExtra("archived", note.archived)
                 intent.putExtra("reminder", note.reminder)
+                intent.putExtra("firebaseID", note.firebaseId)
+                intent.putExtra("currentUser", currentUser)
                 startActivityForResult(intent, Constants.UPDATE_NOTE_REQUEST_CODE)
             }
         })

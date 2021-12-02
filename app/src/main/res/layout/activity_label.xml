@@ -32,12 +32,12 @@
 
         <ImageView
             android:id="@+id/addNewLabelButton"
-            android:tag="add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/button_add" />
+            android:src="@drawable/button_add"
+            android:tag="add" />
 
         <EditText
             android:id="@+id/newLabelTextEdit"
@@ -66,4 +66,16 @@
         android:layout_height="match_parent"
         android:layout_below="@id/newLabelLayout"
         android:layout_marginTop="8dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/saveLabelsFab"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:elevation="8dp"
+        android:src="@drawable/button_fab_check"
+        android:visibility="gone"/>
 </RelativeLayout>

@@ -11,6 +11,7 @@ import com.example.fundo.common.SharedPrefUtil
 import com.example.fundo.data.services.DatabaseService
 import com.example.fundo.data.services.CloudStorageService
 import com.example.fundo.data.wrappers.Label
+import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,6 +38,9 @@ class HomeViewModel : ViewModel() {
 
     private val _getLabelFromDB = MutableLiveData<ArrayList<Label>>()
     val getLabelFromDB = _getLabelFromDB as LiveData<ArrayList<Label>>
+
+    private val _getNotesWithLabel = MutableLiveData<ArrayList<Note>>()
+    val getNotesWithLabel = _getNotesWithLabel as LiveData<ArrayList<Note>>
 
     private val _goToArchive = MutableLiveData<Boolean>()
     val goToArchive = _goToArchive as LiveData<Boolean>
@@ -98,6 +102,14 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             val label = DatabaseService.getInstance(context).getLabels(user)
             _getLabelFromDB.postValue(label)
+        }
+    }
+
+    fun getNotesWithLabel(context: Context, labelID: String, user:User) {
+        viewModelScope.launch {
+            DatabaseService.getInstance(context).getNotesWithLabel(labelID, user).let {
+                _getNotesWithLabel.postValue(it)
+            }
         }
     }
 
