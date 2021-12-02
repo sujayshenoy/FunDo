@@ -4,15 +4,27 @@ import android.app.*
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.lifecycle.ViewModelProvider
 import com.example.fundo.R
 import com.example.fundo.common.Logger
+import com.example.fundo.config.Constants.ASSOCIATE_LABEL_REQUEST_CODE
+import com.example.fundo.data.services.DatabaseService
+import com.example.fundo.data.wrappers.Label
+import com.example.fundo.data.wrappers.User
 import com.example.fundo.databinding.ActivityNoteBinding
+import com.example.fundo.ui.home.label.LabelActivity
+import com.example.fundo.ui.home.label.LabelActivity.Companion.MODE_SELECT
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class NoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteBinding
@@ -21,6 +33,10 @@ class NoteActivity : AppCompatActivity() {
     private var noteTitle = ""
     private var content = ""
     private var reminder: Date? = null
+    private lateinit var firebaseID: String
+    private lateinit var currentUser: User
+    private lateinit var noteViewModel: NoteViewModel
+    private val labelList = ArrayList<Label>()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,9 +44,42 @@ class NoteActivity : AppCompatActivity() {
 
         binding = ActivityNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        noteViewModel = ViewModelProvider(this@NoteActivity)[NoteViewModel::class.java]
 
         loadDataFromIntent()
         attachListeners()
+        noteViewModel.getLabels(this@NoteActivity, firebaseID, currentUser)
+
+        noteViewModel.getLabels.observe(this@NoteActivity){
+            labelList.addAll(it)
+            Logger.logInfo("NoteActivity: labels-> $labelList")
+        }
+
+        noteViewModel.linkLabelStatus.observe(this@NoteActivity){
+            Logger.logInfo("NoteActivity: Linked Labels to Note")
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(requestCode == ASSOCIATE_LABEL_REQUEST_CODE && data != null){
+            val selectedLabels = data.getSerializableExtra("selectedLabels") as ArrayList<Label>
+            noteViewModel.linkNoteLabels(this@NoteActivity, firebaseID, selectedLabels, currentUser)
+
+            val tempLabels = ArrayList<Label>()
+            tempLabels.addAll(labelList)
+
+            tempLabels.removeAll(selectedLabels)
+            tempLabels.forEach {
+                val linkID = "${firebaseID}_${it.firebaseId}"
+                noteViewModel.unlinkNoteLabels(this@NoteActivity, linkID, currentUser)
+            }
+
+            labelList.clear()
+            labelList.addAll(selectedLabels)
+            val a = 0
+        }
     }
 
     private fun loadDataFromIntent() {
@@ -40,6 +89,8 @@ class NoteActivity : AppCompatActivity() {
         content = intent.extras?.getString("content") ?: ""
         archived = intent.extras?.getBoolean("archived") ?: false
         reminder = intent.extras?.getSerializable("reminder") as? Date
+        firebaseID = intent.extras?.getString("firebaseID") ?: ""
+        currentUser = intent.extras?.getSerializable("currentUser") as? User ?: User("","","")
 
         if (noteTitle.isNotEmpty() || content.isNotEmpty()) {
             binding.titleTextEdit.setText(noteTitle)
@@ -47,6 +98,8 @@ class NoteActivity : AppCompatActivity() {
             binding.deleteButton.visibility = View.VISIBLE
             binding.reminderButton.visibility = View.VISIBLE
             binding.archiveButton.visibility = View.VISIBLE
+            binding.addLabelButton.visibility = View.VISIBLE
+
             if (archived) {
                 binding.archiveButton.setImageDrawable(
                     AppCompatResources.getDrawable(
@@ -112,6 +165,14 @@ class NoteActivity : AppCompatActivity() {
             alertDialog.show()
         }
 
+        binding.addLabelButton.setOnClickListener {
+            val intent = Intent(this@NoteActivity,LabelActivity::class.java)
+            intent.putExtra("currentUser", currentUser)
+            intent.putExtra("mode", MODE_SELECT)
+            intent.putExtra("attachedLabels", labelList)
+            startActivityForResult(intent,ASSOCIATE_LABEL_REQUEST_CODE)
+        }
+
         binding.reminderButton.setOnClickListener {
             val currentDateTime = Calendar.getInstance()
             val startYear = currentDateTime.get(Calendar.YEAR)
@@ -125,7 +186,7 @@ class NoteActivity : AppCompatActivity() {
                     TimePickerDialog(
                         this@NoteActivity, { _, hour, minute ->
                             val pickedDateTime = Calendar.getInstance()
-                            pickedDateTime.set(year, month, day, hour, minute,0)
+                            pickedDateTime.set(year, month, day, hour, minute, 0)
                             Logger.logInfo("Picked: ${pickedDateTime.time}")
                             reminder = pickedDateTime.time
                             binding.reminderLayout.visibility = View.VISIBLE

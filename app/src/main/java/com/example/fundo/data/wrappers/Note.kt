@@ -1,6 +1,7 @@
 package com.example.fundo.data.wrappers
 
 import java.util.*
+import kotlin.collections.ArrayList
 
 data class Note(
     var title: String,
@@ -9,5 +10,5 @@ data class Note(
     var firebaseId: String = "",
     var lastModified: Date? = null,
     var archived: Boolean = false,
-    var reminder: Date? = null
+    var reminder: Date? = null,
 )

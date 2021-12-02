@@ -332,6 +332,53 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
         }
     }
 
+    suspend fun linkNoteLabels(noteID: String, labels: ArrayList<Label>, user: User?): Boolean {
+        return try {
+            return withContext(Dispatchers.IO) {
+                labels.forEach { label ->
+                    firebaseDatabaseService.linkNoteLabel(noteID,label.firebaseId,user)
+                }
+                true
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            false
+        }
+    }
+
+    suspend fun removeNoteLabelLink(linkId: String, user: User?): Boolean {
+        return try {
+            return withContext(Dispatchers.IO) {
+                firebaseDatabaseService.removeNoteLabelLink(linkId, user)
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            false
+        }
+    }
+
+    suspend fun getLabelsWithNote(noteID: String, user: User?): ArrayList<Label> {
+        return try {
+            return withContext(Dispatchers.IO) {
+                firebaseDatabaseService.getLabelsWithNote(noteID, user)
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            ArrayList()
+        }
+    }
+
+    suspend fun getNotesWithLabel(labelID: String, user: User?): ArrayList<Note> {
+        return try {
+            return withContext(Dispatchers.IO) {
+                firebaseDatabaseService.getNotesWithLabel(labelID, user)
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            ArrayList()
+        }
+    }
+
     suspend fun getOpCode(note: Note): Int {
         return withContext(Dispatchers.IO) {
             return@withContext sqLiteDatabaseService.getOpCode(note)
