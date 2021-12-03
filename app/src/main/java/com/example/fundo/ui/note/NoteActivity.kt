@@ -37,6 +37,7 @@ class NoteActivity : AppCompatActivity() {
     private lateinit var currentUser: User
     private lateinit var noteViewModel: NoteViewModel
     private val labelList = ArrayList<Label>()
+    private lateinit var dialog: Dialog
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +46,9 @@ class NoteActivity : AppCompatActivity() {
         binding = ActivityNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
         noteViewModel = ViewModelProvider(this@NoteActivity)[NoteViewModel::class.java]
+        dialog = Dialog(this@NoteActivity)
+        dialog.setContentView(R.layout.dialog_loading)
+        dialog.show()
 
         loadDataFromIntent()
         attachListeners()
@@ -53,6 +57,7 @@ class NoteActivity : AppCompatActivity() {
         noteViewModel.getLabels.observe(this@NoteActivity){
             labelList.addAll(it)
             Logger.logInfo("NoteActivity: labels-> $labelList")
+            dialog.dismiss()
         }
 
         noteViewModel.linkLabelStatus.observe(this@NoteActivity){
