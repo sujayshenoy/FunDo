@@ -7,35 +7,35 @@ import com.example.fundo.data.room.entities.NoteEntity
 interface NoteDao {
 
     @Insert
-    suspend fun addNote(noteEntity: NoteEntity): Long
+    fun addNote(noteEntity: NoteEntity): Long
 
     @Query("SELECT * from note WHERE archived = 0")
-    suspend fun getNotes(): List<NoteEntity>
+    fun getNotes(): List<NoteEntity>
 
     @Query("SELECT * from note WHERE archived = 0 LIMIT :limit OFFSET :offset")
-    suspend fun getNotesPaged(limit: Int, offset: Int): List<NoteEntity>
+    fun getNotesPaged(limit: Int, offset: Int): List<NoteEntity>
 
     @Query("SELECT COUNT(*) from note WHERE archived = 0")
-    suspend fun getNotesCount(): Int
+    fun getNotesCount(): Int
 
     @Query("SELECT * from note WHERE archived = 1")
-    suspend fun getArchives(): List<NoteEntity>
+    fun getArchives(): List<NoteEntity>
 
     @Query("SELECT * from note WHERE archived = 1 LIMIT :limit OFFSET :offset")
-    suspend fun getArchivesPaged(limit: Int, offset: Int): List<NoteEntity>
+    fun getArchivesPaged(limit: Int, offset: Int): List<NoteEntity>
 
     @Query("SELECT * from note WHERE NULLIF(reminder,'') IS NOT NULL")
-    suspend fun getReminders(): List<NoteEntity>
+    fun getReminders(): List<NoteEntity>
 
     @Query("SELECT * from note WHERE NULLIF(reminder,'') IS NOT NULL LIMIT :limit OFFSET :offset")
-    suspend fun getRemindersPaged(limit: Int, offset: Int): List<NoteEntity>
+    fun getRemindersPaged(limit: Int, offset: Int): List<NoteEntity>
 
     @Update
-    suspend fun updateNote(noteEntity: NoteEntity)
+    fun updateNote(noteEntity: NoteEntity)
 
     @Delete
-    suspend fun deleteNote(noteEntity: NoteEntity)
+    fun deleteNote(noteEntity: NoteEntity)
 
     @Query("DELETE from note")
-    suspend fun nukeTable()
+    fun nukeTable()
 }

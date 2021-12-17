@@ -3,6 +3,7 @@ package com.example.fundo.data.services
 import android.content.Context
 import com.example.fundo.common.Logger
 import com.example.fundo.common.NetworkService
+import com.example.fundo.data.networking.UserService
 import com.example.fundo.data.wrappers.Label
 import com.example.fundo.data.wrappers.Note
 import com.example.fundo.data.wrappers.User
@@ -43,7 +44,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
     override suspend fun addUserToDB(user: User): User? {
         return try {
             return withContext(Dispatchers.IO) {
-                val newUser = firebaseDatabaseService.getUserFromDB(user.firebaseId)!!
+                val newUser = UserService.getUser(user.firebaseId)
                 return@withContext sqLiteDatabaseService.addUserToDB(newUser)
             }
         } catch (ex: FirebaseException) {
@@ -55,7 +56,7 @@ class DatabaseService(private val context: Context) : DatabaseInterface {    //t
     suspend fun addUserToCloudDB(user: User): User? {
         return try {
             return withContext(Dispatchers.IO) {
-                return@withContext firebaseDatabaseService.addUserToDB(user)
+                return@withContext UserService.addUser(user)
             }
         } catch (ex: FirebaseException) {
             ex.printStackTrace()

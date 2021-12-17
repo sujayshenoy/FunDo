@@ -8,8 +8,8 @@ import com.example.fundo.data.room.entities.UserEntity
 @Dao
 interface UserDao {
     @Insert
-    suspend fun addUser(userEntity: UserEntity): Long
+    fun addUser(userEntity: UserEntity): Long
 
-    @Query("SELECT * from user where uid = :userId LIMIT 1")
-    suspend fun getUser(userId: Long): UserEntity
+    @Query("SELECT * from user where uid = :userId")
+    fun getUser(userId: Long): UserEntity
 }
